@@ -9,26 +9,19 @@ Usage:
 ----
 
     Toml toml = new Toml();
-    toml.parseString("...TOML...");
 
-    System.out.println(toml.getString("title"));
+    // parse a String
+    toml.parseString(tomlContent);
+    // or a file: toml.parseFile(new File("foo.toml"));
 
-    System.out.println(toml.getString("owner.name"));
-    System.out.println(toml.getString("owner.organization"));
-    System.out.println(toml.getString("owner.bio"));
-    System.out.println(toml.getDate("owner.dob").getTime());
-
-    System.out.println(toml.getString("database.server"));
-    System.out.println(toml.getList("database.ports"));
-    System.out.println(toml.getInt("database.connection_max"));
-    System.out.println(toml.getBoolean("database.enabled"));
-
-    System.out.println(toml.getString("servers.alpha.ip"));
-    System.out.println(toml.getString("servers.alpha.dc"));
-    System.out.println(toml.getString("servers.beta.ip"));
-    System.out.println(toml.getString("servers.beta.dc"));
-
-    System.out.println(toml.getList("clients.data"));
+    // get different types
+    toml.get("foo"); // Object
+    toml.getString("foo"); // String
+    toml.getBoolean("foo"); // Boolean
+    toml.getDate("foo"); // Calendar
+    toml.getFloat("foo"); // Float
+    toml.getInt("foo"); // Integer
+    toml.getList("foo"); // List<Object>
 
 Todo:
 -----
