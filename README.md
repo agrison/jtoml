@@ -2,9 +2,6 @@ TOML for Java
 ===
 This is a parser for Tom Preson-Werner's (@mojombo) [TOML](https://raw.github.com/mojombo/toml/) markup language, using Java.
 
-The code's not the prettiest, but it successfully parses the sample file.
-See
-
 Usage:
 ----
 ```java
@@ -28,3 +25,4 @@ Todo:
 -----
 
 * Support for multiline arrays
+* Consider using a grammar and ANTLR for parsing instead of a hand-made one.
