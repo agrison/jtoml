@@ -2,9 +2,7 @@ package me.grison.jtoml;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.*;
 
 /**
  * Toml Utilities.
@@ -29,7 +27,8 @@ public class Util {
             } catch (IndexOutOfBoundsException e) {
                 throw new ParseException("Invalid length", 0);
             }
-            Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").parse(s);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+            Date date = sdf.parse(s);
             calendar.setTime(date);
             return calendar;
         }

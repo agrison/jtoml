@@ -1,6 +1,8 @@
 package me.grison.jtoml;
 
+import com.sun.org.apache.bcel.internal.classfile.Code;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -23,25 +25,24 @@ public class TomlParser {
         abstract Object cast(String v);
     }
     private static final String SPACES = "\\s*";
-    private static final String ANY = ".*";
+    private static final String POSSIBLE_COMMENT = "(#.*)?";
     private static final String KEY_EQUALS = "(" + SPACES + "(\\w+)" + SPACES + "=" + SPACES + ")?";
     private static final String ARRAY = SPACES + "\\[" + SPACES + "(.*)" + SPACES + "\\]" + SPACES;
-    private static final Matcher ARRAY_MATCHER = Pattern.compile(ARRAY).matcher("");
-    private static final Matcher ARRAY_LINE_MATCHER = Pattern.compile(KEY_EQUALS + ARRAY).matcher("");
+    private static final Matcher ARRAY_LINE_MATCHER = Pattern.compile(KEY_EQUALS + ARRAY, Pattern.DOTALL).matcher("");
     private static final Matcher GROUP_MATCHER = Pattern.compile(SPACES + "\\[(.*)\\]" + SPACES).matcher("");
-    private static final Matcher COMMENT = Pattern.compile("(\"|\\])\\s*(#.*)").matcher("");
+    private static final Matcher COMMENT = Pattern.compile("(,|\"|\\])\\s*(#.*)").matcher("");
     private static final List<Handler> HANDLERS = new ArrayList<Handler>() {{
         // dates
         add(new Handler(KEY_EQUALS + "(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*)") {Object cast(String v) {
             try { return Util.ISO8601.toCalendar(v); } catch (Exception e) { return null; } }});
-        // integers
-        add(new Handler(KEY_EQUALS + "(\\d+)" + SPACES + ANY) {Object cast(String v) {return Integer.valueOf(v);}});
         // floats
-        add(new Handler(KEY_EQUALS + "([-+]?\\d*\\.?\\d+([eE][-+]?\\d+)?)" + SPACES + ANY) {Object cast(String v) {return Float.valueOf(v);}});
+        add(new Handler(KEY_EQUALS + "([-+]?\\d*\\.\\d+([eE][-+]?\\d+)?)" + SPACES + POSSIBLE_COMMENT) {Object cast(String v) {return Float.valueOf(v);}});
+        // integers
+        add(new Handler(KEY_EQUALS + "(\\d+)" + SPACES + POSSIBLE_COMMENT) {Object cast(String v) {return Integer.valueOf(v);}});
         // strings
         add(new Handler(KEY_EQUALS + "\"(.*)\"" + SPACES) {Object cast(String v) {return StringEscapeUtils.unescapeJava(v.trim());}});
         // booleans
-        add(new Handler(KEY_EQUALS + "(true|false)" + SPACES + ANY) {Object cast(String v) {return Boolean.parseBoolean(v);}});
+        add(new Handler(KEY_EQUALS + "(true|false)" + SPACES + POSSIBLE_COMMENT) {Object cast(String v) {return Boolean.parseBoolean(v);}});
     }};
 
     /**
@@ -53,6 +54,7 @@ public class TomlParser {
     public static Map<String, Object> parse(String s) {
         Map<String, Object> result = new LinkedHashMap<String, Object>();
         Map<String, Object> context = result;
+        s = prepareArrays(s);
         // match lines
         Matcher lines = Pattern.compile("([^\n]+)\n?").matcher(s);
         while (lines.find()) {
@@ -68,6 +70,34 @@ public class TomlParser {
                 context.put((String)val[0], val[1]);
         }
         return result;
+    }
+
+    /**
+     * Find every arrays in the given String and make them one liner.
+     * prepareArrays('foo = [\n 1, 2, 3,\n 4,\n 5, #this is ok\n ]')
+     * -> 'foo = [ 1, 2, 3, 4, 5 ]'
+     * @return the given String with arrays on one line
+     */
+    private static String prepareArrays(String s) {
+        StringBuffer buffer = new StringBuffer();
+        String currentLine = "";
+        for (String l: s.split("\n")) {
+            currentLine = currentLine + l;
+            if (StringUtils.countMatches(currentLine, "[") == StringUtils.countMatches(currentLine, "]")) {
+                if (l.equals(currentLine)) { // nothing done
+                    buffer.append(currentLine);
+                } else { // multiline -> single line
+                    buffer.append(
+                        currentLine.replaceAll("#[^],]+", "") // skip comments
+                           .replaceAll("\\[\\s*", "[").replaceAll("\\s*\\]", "]") // remove spaces around brackets
+                           .replaceAll(",\\s*", ",").replaceAll(",,", ",") // spaces and empty commas
+                    );
+                }
+                buffer.append("\n");
+                currentLine = "";
+            }
+        }
+        return buffer.toString();
     }
 
     /**

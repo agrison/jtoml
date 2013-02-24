@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ public class TestToml {
 
         Assert.assertEquals("192.168.1.1", toml.getString("database.server"));
         Assert.assertEquals(3, toml.getList("database.ports").size());
+        Assert.assertEquals(Arrays.asList(8001, 8001, 8002), toml.getList("database.ports"));
         Assert.assertEquals(5000, toml.getInt("database.connection_max").intValue());
         Assert.assertEquals(42, toml.getInt("database.latency_max").intValue());
         Assert.assertEquals(true, toml.getBoolean("database.enabled"));
@@ -40,7 +42,15 @@ public class TestToml {
 
         List<Object> clientsData = toml.getList("clients.data");
         Assert.assertEquals(2, clientsData.size());
-        Assert.assertEquals(2, ((List<?>)clientsData.get(0)).size());
-        Assert.assertEquals(2, ((List<?>)clientsData.get(1)).size());
+        Assert.assertEquals(Arrays.asList("gamma", "delta"), clientsData.get(0));
+        Assert.assertEquals(Arrays.asList(1, 2), clientsData.get(1));
+
+        List<Object> multiline = toml.getList("clients.multiline");
+        Assert.assertEquals(2, multiline.size());
+        Assert.assertEquals(Arrays.asList(1, 2, 3), multiline.get(0));
+        Assert.assertEquals(Arrays.asList("hello", "world"), ((List<?>) multiline).get(1));
+
+        List<Object> superList = toml.getList("clients.super");
+        Assert.assertEquals(Arrays.asList(1, 2), superList);
     }
 }

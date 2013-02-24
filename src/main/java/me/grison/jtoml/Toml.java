@@ -91,6 +91,8 @@ public class Toml implements Parser, Getter {
         Object value = get(key);
         if (value instanceof Integer) {
             return (Integer) value;
+        } else if (value instanceof Float) {
+            return ((Float) value).intValue();
         } else {
             throw new IllegalArgumentException("Value for key `" + key + "` is not of type Integer" + //
                     (value == null ? "" : " but of type " + value.getClass().getName()));

@@ -29,3 +29,14 @@ awesome = false # just because
 
 [clients]
 data = [ ["gamma", "delta"], [1, 2] ] # just an update to make sure parsers support it
+multiline = [
+    [ 1, 2, 3
+    ],
+    [  "hello",
+        "world"
+         ]
+]
+super = [
+    1,
+    2, # this is ok
+]
