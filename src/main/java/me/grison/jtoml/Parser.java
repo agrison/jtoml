@@ -1,5 +1,8 @@
 package me.grison.jtoml;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * Toml Parser interface
  *
@@ -11,5 +14,11 @@ public interface Parser {
      * @param string the string to be parsed.
      */
     void parseString(String string);
-    //void parseFile(File file);
+
+    /**
+     * Parse the given File as TOML.
+     * @param file the file to be parsed.
+     * @throws IOException
+     */
+    void parseFile(File file) throws IOException;
 }

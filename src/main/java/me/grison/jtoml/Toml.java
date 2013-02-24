@@ -1,5 +1,9 @@
 package me.grison.jtoml;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,6 +29,11 @@ public class Toml implements Parser, Getter {
     @Override
     public void parseString(String string) {
         context = TomlParser.parse(string);
+    }
+
+    @Override
+    public void parseFile(File file) throws IOException {
+        context = TomlParser.parse(FileUtils.readFileToString(file));
     }
 
     private String keyPath(String s) {

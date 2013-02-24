@@ -24,13 +24,15 @@ public class TestToml {
 
         Assert.assertEquals("Tom Preston-Werner", toml.getString("owner.name"));
         Assert.assertEquals("GitHub", toml.getString("owner.organization"));
-        Assert.assertEquals("GitHub Cofounder & CEO\nLikes tater tots and beer.", toml.getString("owner.bio"));
+        Assert.assertEquals("GitHub Cofounder & CEO\nLikes tater tots and beer #awesome.", toml.getString("owner.bio"));
         Assert.assertEquals("Sun May 27 09:32:00 CEST 1979", toml.getDate("owner.dob").getTime().toString());
 
         Assert.assertEquals("192.168.1.1", toml.getString("database.server"));
         Assert.assertEquals(3, toml.getList("database.ports").size());
         Assert.assertEquals(5000, toml.getInt("database.connection_max").intValue());
+        Assert.assertEquals(42, toml.getInt("database.latency_max").intValue());
         Assert.assertEquals(true, toml.getBoolean("database.enabled"));
+        Assert.assertEquals(false, toml.getBoolean("database.awesome"));
 
         Assert.assertEquals("10.0.0.1", toml.getString("servers.alpha.ip"));
         Assert.assertEquals("eqdc10", toml.getString("servers.alpha.dc"));

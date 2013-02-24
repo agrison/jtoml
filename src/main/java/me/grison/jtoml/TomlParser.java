@@ -23,23 +23,25 @@ public class TomlParser {
         abstract Object cast(String v);
     }
     private static final String SPACES = "\\s*";
+    private static final String ANY = ".*";
     private static final String KEY_EQUALS = "(" + SPACES + "(\\w+)" + SPACES + "=" + SPACES + ")?";
     private static final String ARRAY = SPACES + "\\[" + SPACES + "(.*)" + SPACES + "\\]" + SPACES;
     private static final Matcher ARRAY_MATCHER = Pattern.compile(ARRAY).matcher("");
     private static final Matcher ARRAY_LINE_MATCHER = Pattern.compile(KEY_EQUALS + ARRAY).matcher("");
     private static final Matcher GROUP_MATCHER = Pattern.compile(SPACES + "\\[(.*)\\]" + SPACES).matcher("");
+    private static final Matcher COMMENT = Pattern.compile("(\"|\\])\\s*(#.*)").matcher("");
     private static final List<Handler> HANDLERS = new ArrayList<Handler>() {{
-        // integers
-        add(new Handler(KEY_EQUALS + "(\\d+)" + SPACES) {Object cast(String v) {return Integer.valueOf(v);}});
-        // floats
-        add(new Handler(KEY_EQUALS + "([-+]?\\d*\\.?\\d+([eE][-+]?\\d+)?)" + SPACES) {Object cast(String v) {return Float.valueOf(v);}});
-        // strings
-        add(new Handler(KEY_EQUALS + "\"(.*)\"" + SPACES) {Object cast(String v) {return StringEscapeUtils.unescapeJava(v.trim());}});
-        // booleans
-        add(new Handler(KEY_EQUALS + "(true|false)" + SPACES) {Object cast(String v) {return Boolean.parseBoolean(v);}});
         // dates
         add(new Handler(KEY_EQUALS + "(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*)") {Object cast(String v) {
             try { return Util.ISO8601.toCalendar(v); } catch (Exception e) { return null; } }});
+        // integers
+        add(new Handler(KEY_EQUALS + "(\\d+)" + SPACES + ANY) {Object cast(String v) {return Integer.valueOf(v);}});
+        // floats
+        add(new Handler(KEY_EQUALS + "([-+]?\\d*\\.?\\d+([eE][-+]?\\d+)?)" + SPACES + ANY) {Object cast(String v) {return Float.valueOf(v);}});
+        // strings
+        add(new Handler(KEY_EQUALS + "\"(.*)\"" + SPACES) {Object cast(String v) {return StringEscapeUtils.unescapeJava(v.trim());}});
+        // booleans
+        add(new Handler(KEY_EQUALS + "(true|false)" + SPACES + ANY) {Object cast(String v) {return Boolean.parseBoolean(v);}});
     }};
 
     /**
@@ -54,7 +56,12 @@ public class TomlParser {
         // match lines
         Matcher lines = Pattern.compile("([^\n]+)\n?").matcher(s);
         while (lines.find()) {
-            String line = lines.group().trim().split("#")[0];
+            String line = lines.group().trim();
+            System.out.println("AAAAAA: [" + line + "]");
+            if (COMMENT.reset(line).find()) {
+                line = line.replace(COMMENT.group(2), "");
+                System.out.println("BBBBB: [" + line + "]");
+            }
             if (GROUP_MATCHER.reset(line).matches()) {
                 context = createContextIfNeeded(result, GROUP_MATCHER.group(1));
             }
