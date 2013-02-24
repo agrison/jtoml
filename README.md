@@ -6,7 +6,7 @@ Usage:
 ----
 ```java
 Toml toml = Toml.parse("pi = 3.14\nfoo = \"bar\""); // parse a String
-// or a file: Toml.parse(new File("foo.toml"));
+toml = Toml.parse(new File("foo.toml")); // or a file
 
 // get different types
 toml.get("foo"); // Object
