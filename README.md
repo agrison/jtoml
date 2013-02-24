@@ -7,21 +7,22 @@ See
 
 Usage:
 ----
+```java
+Toml toml = new Toml();
 
-    Toml toml = new Toml();
+// parse a String
+toml.parseString(tomlContent);
+// or a file: toml.parseFile(new File("foo.toml"));
 
-    // parse a String
-    toml.parseString(tomlContent);
-    // or a file: toml.parseFile(new File("foo.toml"));
-
-    // get different types
-    toml.get("foo"); // Object
-    toml.getString("foo"); // String
-    toml.getBoolean("foo"); // Boolean
-    toml.getDate("foo"); // Calendar
-    toml.getFloat("foo"); // Float
-    toml.getInt("foo"); // Integer
-    toml.getList("foo"); // List<Object>
+// get different types
+toml.get("foo"); // Object
+toml.getString("foo"); // String
+toml.getBoolean("foo"); // Boolean
+toml.getDate("foo"); // Calendar
+toml.getFloat("foo"); // Float
+toml.getInt("foo"); // Integer
+toml.getList("foo"); // List<Object>
+```
 
 Todo:
 -----
