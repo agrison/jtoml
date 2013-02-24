@@ -1,5 +1,7 @@
 package me.grison.jtoml;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -32,7 +34,7 @@ public class TomlParser {
         // floats
         add(new Handler(KEY_EQUALS + "([-+]?\\d*\\.?\\d+([eE][-+]?\\d+)?)" + SPACES) {Object cast(String v) {return Float.valueOf(v);}});
         // strings
-        add(new Handler(KEY_EQUALS + "\"(.*)\"" + SPACES) {Object cast(String v) {return v;}});
+        add(new Handler(KEY_EQUALS + "\"(.*)\"" + SPACES) {Object cast(String v) {return StringEscapeUtils.unescapeJava(v.trim());}});
         // booleans
         add(new Handler(KEY_EQUALS + "(true|false)" + SPACES) {Object cast(String v) {return Boolean.parseBoolean(v);}});
         // dates
@@ -52,7 +54,7 @@ public class TomlParser {
         // match lines
         Matcher lines = Pattern.compile("([^\n]+)\n?").matcher(s);
         while (lines.find()) {
-            String line = lines.group().trim();
+            String line = lines.group().trim().split("#")[0];
             if (GROUP_MATCHER.reset(line).matches()) {
                 context = createContextIfNeeded(result, GROUP_MATCHER.group(1));
             }

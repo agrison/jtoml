@@ -25,7 +25,6 @@ public class Toml implements Parser, Getter {
     @Override
     public void parseString(String string) {
         context = TomlParser.parse(string);
-        System.out.println(context);
     }
 
     private String keyPath(String s) {
