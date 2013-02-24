@@ -28,5 +28,3 @@ Todo:
 -----
 
 * Support for multiline arrays
-* Tests
-* Maven packaging
