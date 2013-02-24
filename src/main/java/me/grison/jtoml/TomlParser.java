@@ -57,10 +57,8 @@ public class TomlParser {
         Matcher lines = Pattern.compile("([^\n]+)\n?").matcher(s);
         while (lines.find()) {
             String line = lines.group().trim();
-            System.out.println("AAAAAA: [" + line + "]");
             if (COMMENT.reset(line).find()) {
                 line = line.replace(COMMENT.group(2), "");
-                System.out.println("BBBBB: [" + line + "]");
             }
             if (GROUP_MATCHER.reset(line).matches()) {
                 context = createContextIfNeeded(result, GROUP_MATCHER.group(1));

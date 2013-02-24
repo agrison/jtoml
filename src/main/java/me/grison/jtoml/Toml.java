@@ -26,14 +26,35 @@ public class Toml implements Parser, Getter {
     Map<String, Object> context = new LinkedHashMap<String, Object>();
     final Matcher keyPathMatcher = Pattern.compile("((\\w+[.])+).*").matcher("");
 
-    @Override
-    public void parseString(String string) {
-        context = TomlParser.parse(string);
+    /**
+     * Creates a TOML instance loaded with the given String.
+     * @param string the TOML String to load.
+     * @return a TOM object instance
+     */
+    public static Toml parse(String string) {
+        return new Toml().parseString(string);
+    }
+
+    /**
+     * Creates a TOML instance loaded with the given file.
+     * @param file the TOML file to load
+     * @return a TOML object instance
+     * @throws IOException
+     */
+    public static Toml parse(File file) throws IOException {
+        return new Toml().parseFile(file);
     }
 
     @Override
-    public void parseFile(File file) throws IOException {
+    public Toml parseString(String string) {
+        context = TomlParser.parse(string);
+        return this;
+    }
+
+    @Override
+    public Toml parseFile(File file) throws IOException {
         context = TomlParser.parse(FileUtils.readFileToString(file));
+        return this;
     }
 
     private String keyPath(String s) {

@@ -16,9 +16,8 @@ import java.util.Map;
 public class TestToml {
     @Test
     public void test() throws IOException {
-        Toml toml = new Toml();
         String tomlContent = new String(IOUtils.toByteArray(getClass().getResourceAsStream("/test.toml")), "UTF-8");
-        toml.parseString(tomlContent);
+        Toml toml = Toml.parse(tomlContent);
 
         Assert.assertEquals("TOML Example", toml.getString("title"));
 
