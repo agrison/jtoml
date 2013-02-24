@@ -106,8 +106,4 @@ public class Util {
             return new Scanner(file).useDelimiter("\\Z").next();
         }
     }
-
-    public static void main(String... a) {
-        System.out.println("-> " + Util.TomlString.countOccurences("[ [ [ [", "["));
-    }
 }
