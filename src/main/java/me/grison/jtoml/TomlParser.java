@@ -1,13 +1,12 @@
 package me.grison.jtoml;
 
-import com.sun.org.apache.bcel.internal.classfile.Code;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
 
 /**
  * Toml parser.
@@ -40,7 +39,7 @@ public class TomlParser {
         // integers
         add(new Handler(KEY_EQUALS + "(\\d+)" + SPACES + POSSIBLE_COMMENT) {Object cast(String v) {return Integer.valueOf(v);}});
         // strings
-        add(new Handler(KEY_EQUALS + "\"(.*)\"" + SPACES) {Object cast(String v) {return StringEscapeUtils.unescapeJava(v.trim());}});
+        add(new Handler(KEY_EQUALS + "\"(.*)\"" + SPACES) {Object cast(String v) {return Util.TomlString.unescape(v.trim());}});
         // booleans
         add(new Handler(KEY_EQUALS + "(true|false)" + SPACES + POSSIBLE_COMMENT) {Object cast(String v) {return Boolean.parseBoolean(v);}});
     }};
@@ -83,7 +82,7 @@ public class TomlParser {
         String currentLine = "";
         for (String l: s.split("\n")) {
             currentLine = currentLine + l;
-            if (StringUtils.countMatches(currentLine, "[") == StringUtils.countMatches(currentLine, "]")) {
+            if (Util.TomlString.countOccurences(currentLine, "[") == Util.TomlString.countOccurences(currentLine, "]")) {
                 if (l.equals(currentLine)) { // nothing done
                     buffer.append(currentLine);
                 } else { // multiline -> single line

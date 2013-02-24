@@ -1,8 +1,7 @@
 package me.grison.jtoml;
 
-import org.apache.commons.io.FileUtils;
-
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
@@ -51,11 +50,11 @@ public class Toml implements Parser, Getter {
         return this;
     }
 
-    @Override
-    public Toml parseFile(File file) throws IOException {
-        context = TomlParser.parse(FileUtils.readFileToString(file));
-        return this;
-    }
+	@Override
+	public Toml parseFile(File file) throws FileNotFoundException {
+		context = TomlParser.parse(Util.FileToString.read(file));
+		return this;
+	}
 
     private String keyPath(String s) {
         if (keyPathMatcher.reset(s).matches()) {

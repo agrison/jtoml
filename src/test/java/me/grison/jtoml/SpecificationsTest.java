@@ -1,21 +1,12 @@
+package me.grison.jtoml;
+
 import junit.framework.Assert;
-import me.grison.jtoml.Toml;
 import org.junit.Test;
 
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Locale;
 
-/**
- * DOCUMENT_ME.
- * <p/>
- * <p>DISCLAIMER: Project owner MJUS.</p>
- *
- * @author <a href="mailto:mjus.project-mjarm@arhs-consulting.com">$Author: grisonal $</a>
- * @version $Revision: 1 $ - $Date: 2013-01-30 17:45:08 +0100 (mer., 30 janv. 2013) $
- */
-public class TestSpecifications {
+public class SpecificationsTest {
     static {
         Locale.setDefault(Locale.US);
     }
