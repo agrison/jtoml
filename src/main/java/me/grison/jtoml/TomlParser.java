@@ -1,9 +1,9 @@
 package me.grison.jtoml;
 
-import org.apache.commons.lang.StringEscapeUtils;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,7 +39,7 @@ public class TomlParser {
         // floats
         add(new Handler(KEY_EQUALS + "([-+]?\\d*\\.?\\d+([eE][-+]?\\d+)?)" + SPACES + ANY) {Object cast(String v) {return Float.valueOf(v);}});
         // strings
-        add(new Handler(KEY_EQUALS + "\"(.*)\"" + SPACES) {Object cast(String v) {return StringEscapeUtils.unescapeJava(v.trim());}});
+        add(new Handler(KEY_EQUALS + "\"(.*)\"" + SPACES) {Object cast(String v) {return Util.TomlString.unescape(v.trim());}});
         // booleans
         add(new Handler(KEY_EQUALS + "(true|false)" + SPACES + ANY) {Object cast(String v) {return Boolean.parseBoolean(v);}});
     }};
