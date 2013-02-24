@@ -5,7 +5,7 @@ This is a parser for Tom Preson-Werner's (@mojombo) [TOML](https://raw.github.co
 Usage:
 ----
 ```java
-Toml toml = Toml.parse(tomlContent); // parse a String
+Toml toml = Toml.parse("pi = 3.14\nfoo = \"bar\""); // parse a String
 // or a file: Toml.parse(new File("foo.toml"));
 
 // get different types
