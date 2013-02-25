@@ -21,5 +21,8 @@ toml.getList("foo"); // List<Object>
 Todo:
 -----
 
-* Support for multiline arrays
 * Consider using a grammar and ANTLR for parsing instead of a hand-made one.
+
+License:
+-----
+MIT.
