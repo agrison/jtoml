@@ -37,6 +37,11 @@ public class Util {
         }
     }
 
+    /**
+     * Toml String Utilities.
+     * <p/>
+     * Note: This is to avoid dependency on Apache commons for such limited features.
+     */
     public static class TomlString {
         /**
          * Unescapes the a list of literals found in the given String.
@@ -47,7 +52,7 @@ public class Util {
          *     <li><code>'\'</code> + <code>'t'</code> -> <code>'\t'</code> tab character (0x09)</li>
          *     <li><code>'\'</code> + <code>'n'</code> -> <code>'\n'</code> newline character (0x0a)</li>
          *     <li><code>'\'</code> + <code>'r'</code> -> <code>'\r'</code> carriage return character (0x0d)</li>
-        // \" - quote (0x22)
+         *     <li><code>'\'</code> + <code>'"'</code> -> <code>'"'</code> quote character (0x22)</li>
          *     <li><code>'\'</code> + <code>'\'</code> -> <code>'\'</code> backslash character (0x5c)</li>
          * </ul>
          *
@@ -115,7 +120,7 @@ public class Util {
          * @param needle the String to count the occurrences of.
          * @return the number of occurrences found.
          */
-        public static int countOccurences(String str, String needle) {
+        public static int countOccurrences(String str, String needle) {
             int index = 0, count = 0;
             while (index != -1) {
                 index = str.indexOf(needle, index);

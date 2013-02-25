@@ -14,12 +14,7 @@ import java.util.regex.Pattern;
  * Toml parsing class front-end.
  * 
  * <code>
-<<<<<<< HEAD
  *     Toml toml = Toml.parse("pi = 3.141592653589793");
-=======
- *     Toml toml = new Toml();
- *     toml.parse("pi = 3.14");
->>>>>>> comment
  *     Double pi = toml.getDouble("pi");
  * </code>
  *
