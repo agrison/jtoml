@@ -34,8 +34,8 @@ public class TomlParser {
         // dates
         add(new Handler(KEY_EQUALS + "(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*)") {Object cast(String v) {
             try { return Util.ISO8601.toCalendar(v); } catch (Exception e) { return null; } }});
-        // floats
-        add(new Handler(KEY_EQUALS + "([-+]?\\d*\\.\\d+([eE][-+]?\\d+)?)" + SPACES + POSSIBLE_COMMENT) {Object cast(String v) {return Float.valueOf(v);}});
+        // doubles
+        add(new Handler(KEY_EQUALS + "([-+]?\\d*\\.\\d+([eE][-+]?\\d+)?)" + SPACES + POSSIBLE_COMMENT) {Object cast(String v) {return Double.valueOf(v);}});
         // integers
         add(new Handler(KEY_EQUALS + "(\\d+)" + SPACES + POSSIBLE_COMMENT) {Object cast(String v) {return Integer.valueOf(v);}});
         // strings

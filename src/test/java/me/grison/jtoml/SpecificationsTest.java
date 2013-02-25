@@ -17,9 +17,9 @@ public class SpecificationsTest {
     }
 
     @Test
-    public void testFloat() {
+    public void testDouble() {
         Toml toml = Toml.parse("foo = 13.37");
-        Assert.assertEquals(13.37, toml.getFloat("foo").floatValue(), 0.00001f);
+        Assert.assertEquals(13.37, toml.getDouble("foo").doubleValue(), 0.00001d);
     }
 
     @Test

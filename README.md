@@ -13,7 +13,7 @@ toml.get("foo"); // Object
 toml.getString("foo"); // String
 toml.getBoolean("foo"); // Boolean
 toml.getDate("foo"); // Calendar
-toml.getFloat("foo"); // Float
+toml.getDouble("foo"); // Double
 toml.getInt("foo"); // Integer
 toml.getList("foo"); // List<Object>
 ```

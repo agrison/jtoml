@@ -80,8 +80,7 @@ public class Toml implements Parser, Getter {
         if (value instanceof String) {
             return (String) value;
         } else {
-            throw new IllegalArgumentException("Value for key `" + key + "` is not of type String" + //
-                    (value == null ? "" : " but of type " + value.getClass().getName()));
+            throw illegalArg(key, value, String.class);
         }
     }
 
@@ -93,19 +92,17 @@ public class Toml implements Parser, Getter {
         } else if (value instanceof Float) {
             return ((Float) value).intValue();
         } else {
-            throw new IllegalArgumentException("Value for key `" + key + "` is not of type Integer" + //
-                    (value == null ? "" : " but of type " + value.getClass().getName()));
+            throw illegalArg(key, value, Integer.class);
         }
     }
 
     @Override
-    public Float getFloat(String key) {
+    public Double getDouble(String key) {
         Object value = get(key);
-        if (value instanceof Float) {
-            return (Float) value;
+        if (value instanceof Double) {
+            return (Double) value;
         } else {
-            throw new IllegalArgumentException("Value for key `" + key + "` is not of type Float" + //
-                    (value == null ? "" : " but of type " + value.getClass().getName()));
+            throw illegalArg(key, value, Double.class);
         }
     }
 
@@ -115,8 +112,7 @@ public class Toml implements Parser, Getter {
         if (value instanceof Calendar) {
             return (Calendar) value;
         } else {
-            throw new IllegalArgumentException("Value for key `" + key + "` is not of type Calendar" + //
-                    (value == null ? "" : " but of type " + value.getClass().getName()));
+            throw illegalArg(key, value, Calendar.class);
         }
     }
 
@@ -126,8 +122,7 @@ public class Toml implements Parser, Getter {
         if (value instanceof List) {
             return (List) value;
         } else {
-            throw new IllegalArgumentException("Value for key `" + key + "` is not of type List" + //
-                    (value == null ? "" : " but of type " + value.getClass().getName()));
+            throw illegalArg(key, value, List.class);
         }
     }
 
@@ -137,8 +132,19 @@ public class Toml implements Parser, Getter {
         if (value instanceof Boolean) {
             return (Boolean) value;
         } else {
-            throw new IllegalArgumentException("Value for key `" + key + "` is not of type Boolean" + //
-                    (value == null ? "" : " but of type " + value.getClass().getName()));
+            throw illegalArg(key, value, Boolean.class);
         }
+    }
+
+    /**
+     * Creates an IllegalArgumentException with a pre-filled message.
+     * @param key the key
+     * @param expected the expected type
+     * @param value the value
+     * @return the exception ready to be thrown
+     */
+    private IllegalArgumentException illegalArg(String key, Object value, Class<?> expected) {
+       return new IllegalArgumentException(String.format("Value for key `%s` is `%s`%s.", //
+               key, value, (value == null ? "" : ". Expected type was " + expected.getName() + "`")));
     }
 }

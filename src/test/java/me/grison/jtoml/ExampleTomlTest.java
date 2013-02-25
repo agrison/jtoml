@@ -39,7 +39,6 @@ public class ExampleTomlTest {
 
 	@Test
 	public void testNestedStrings() {
-
 		// [owner]
 		// name = "Tom Preston-Werner"
 		// organization = "GitHub"
@@ -49,7 +48,6 @@ public class ExampleTomlTest {
 
 	@Test
 	public void testNewlineAndHashInString() {
-
 		// [owner]
 		// bio = "GitHub Cofounder & CEO\nLikes tater tots and beer #awesome."
 		assertEquals(
@@ -67,7 +65,6 @@ public class ExampleTomlTest {
 
 	@Test
 	public void testArray() {
-
 		// [database]
 		// server = "192.168.1.1"
 		// ports = [ 8001, 8001, 8002 ]

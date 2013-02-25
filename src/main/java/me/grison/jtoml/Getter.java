@@ -31,11 +31,11 @@ public interface Getter {
     Integer getInt(String key);
 
     /**
-     * Get the float.
+     * Get the double value.
      * @param key the key where the object is located
      * @return the float located at the given key.
      */
-    Float getFloat(String key);
+    Double getDouble(String key);
 
     /**
      * Get the date (as Calendar)
