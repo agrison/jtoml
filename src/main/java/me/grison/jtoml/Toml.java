@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 /**
  * Toml parsing class front-end.
- * 
+ *
  * <code>
  *     Toml toml = Toml.parse("pi = 3.141592653589793");
  *     Double pi = toml.getDouble("pi");
@@ -51,7 +51,7 @@ public class Toml implements Parser, Getter {
 
 	@Override
 	public Toml parseFile(File file) throws FileNotFoundException {
-		context = TomlParser.parse(Util.FileToString.read(file));
+		parseString(Util.FileToString.read(file));
 		return this;
 	}
 
