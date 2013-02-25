@@ -14,12 +14,11 @@ import java.util.regex.Pattern;
  * Toml parsing class front-end.
  * 
  * <code>
- *     Toml toml = new Toml();
- *     toml.parse("pi = 3.14");
- *     toml.getFloat("pi");
+ *     Toml toml = Toml.parse("pi = 3.141592653589793");
+ *     Double pi = toml.getDouble("pi");
  * </code>
  *
- * @author $Author: alexandre grison$
+ * @author <a href="mailto:a.grison@gmail.com">$Author: Alexandre Grison$</a>
 */
 public class Toml implements Parser, Getter {
     Map<String, Object> context = new LinkedHashMap<String, Object>();
@@ -56,11 +55,22 @@ public class Toml implements Parser, Getter {
 		return this;
 	}
 
-    private String keyPath(String s) {
-        if (keyPathMatcher.reset(s).matches()) {
+    /**
+     * Get the path to a key.
+     * A key can be anything like <code>(\w[.])*\w</code>
+     *
+     * <p><code>keyPath("foo") -> "foo"</code></p>
+     * <p><code>keyPath("foo.bar") -> "foo"</code></p>
+     * <p><code>keyPath("foo.bar.bazz") -> "foo.bar"</code></p>
+     *
+     * @param key the key
+     * @return the path leading to the key.
+     */
+    private String keyPath(String key) {
+        if (keyPathMatcher.reset(key).matches()) {
             return keyPathMatcher.group(1).substring(0, keyPathMatcher.group(1).length() - 1);
         } else {
-            return s;
+            return key;
         }
     }
 

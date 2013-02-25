@@ -13,7 +13,7 @@ import java.util.regex.Matcher;
  *
  * <p>Should maybe use an ANTLR grammar in next version instead of such a basic parsing.</p>
  *
- * @author $Author: Alexandre Grison$
+ * @author <a href="mailto:a.grison@gmail.com">$Author: Alexandre Grison$</a>
  */
 public class TomlParser {
     /** Encapsulate both a Matcher and a method to cast the retrieved value to the according type. */
@@ -30,6 +30,7 @@ public class TomlParser {
     private static final Matcher ARRAY_LINE_MATCHER = Pattern.compile(KEY_EQUALS + ARRAY, Pattern.DOTALL).matcher("");
     private static final Matcher GROUP_MATCHER = Pattern.compile(SPACES + "\\[(.*)\\]" + SPACES).matcher("");
     private static final Matcher COMMENT = Pattern.compile("(,|\"|\\])\\s*(#.*)").matcher("");
+    /** The list of handlers */
     private static final List<Handler> HANDLERS = new ArrayList<Handler>() {{
         // dates
         add(new Handler(KEY_EQUALS + "(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*)") {Object cast(String v) {
@@ -82,7 +83,7 @@ public class TomlParser {
         String currentLine = "";
         for (String l: s.split("\n")) {
             currentLine = currentLine + l;
-            if (Util.TomlString.countOccurences(currentLine, "[") == Util.TomlString.countOccurences(currentLine, "]")) {
+            if (Util.TomlString.countOccurrences(currentLine, "[") == Util.TomlString.countOccurrences(currentLine, "]")) {
                 if (l.equals(currentLine)) { // nothing done
                     buffer.append(currentLine);
                 } else { // multiline -> single line

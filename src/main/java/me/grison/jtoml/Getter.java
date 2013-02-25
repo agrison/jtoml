@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Toml getter interface.
  *
- * @author $Author: alexandre grison$
+ * @author <a href="mailto:a.grison@gmail.com">$Author: Alexandre Grison$</a>
  */
 public interface Getter {
     /**

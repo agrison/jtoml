@@ -6,6 +6,11 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Locale;
 
+/**
+ * Unit test for specifications (types).
+ *
+ * @author <a href="mailto:a.grison@gmail.com">$Author: Alexandre Grison$</a>
+ */
 public class SpecificationsTest {
     static {
         Locale.setDefault(Locale.US);
@@ -18,8 +23,8 @@ public class SpecificationsTest {
 
     @Test
     public void testDouble() {
-        Toml toml = Toml.parse("foo = 13.37");
-        Assert.assertEquals(13.37, toml.getDouble("foo").doubleValue(), 0.00001d);
+        Toml toml = Toml.parse("foo = 3.141592653589793");
+        Assert.assertEquals(3.14159265, toml.getDouble("foo").doubleValue(), 0.00001d);
     }
 
     @Test

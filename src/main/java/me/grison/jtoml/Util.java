@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * Toml Utilities.
  *
- * @author $Author: alexandre grison$
+ * @author <a href="mailto:a.grison@gmail.com">$Author: Alexandre Grison$</a>
  */
 public class Util {
     /**
@@ -38,12 +38,22 @@ public class Util {
     }
 
     public static class TomlString {
-        // \0 - null character (0x00)
-        // \t - tab (0x09)
-        // \n - newline (0x0a)
-        // \r - carriage return (0x0d)
+        /**
+         * Unescapes the a list of literals found in the given String.
+         * It will replace characters (<code>'\' + 't'</code>, <code>'\' + 'n'</code>, ...) to there equivalent (<code>'\t'</code>, <code>'\n'</code>).
+         *
+         * <ul>
+         *     <li><code>'\'</code> + <code>'0'</code> -> <code>'\0'</code> null character (0x00)</li>
+         *     <li><code>'\'</code> + <code>'t'</code> -> <code>'\t'</code> tab character (0x09)</li>
+         *     <li><code>'\'</code> + <code>'n'</code> -> <code>'\n'</code> newline character (0x0a)</li>
+         *     <li><code>'\'</code> + <code>'r'</code> -> <code>'\r'</code> carriage return character (0x0d)</li>
         // \" - quote (0x22)
-        // \\ - backslash (0x5c)
+         *     <li><code>'\'</code> + <code>'\'</code> -> <code>'\'</code> backslash character (0x5c)</li>
+         * </ul>
+         *
+         * @param input the String to unescape
+         * @return the unescaped String
+         */
         public static String unescape(String input) {
             StringBuffer buffer = new StringBuffer(input.length());
             for (int i = 0; i < input.length(); i++) {
@@ -75,19 +85,36 @@ public class Util {
                             buffer.append('"');
                             break;
                         default:
-                            throw new IllegalArgumentException("Escape sequence \\ " + ch + " in isn't known. Known sequences are: " + "\\0, \\t, \\n, \\b, \\r, \\\\, \\\".\n" + "Offending string: " + input + "\n" + "                 " + createWhitespaceString(i) + "^");
+                            throw new IllegalArgumentException("Escape sequence \\ " + ch + " in isn't known. " + //
+                                    "Known sequences are: " + "\\0, \\t, \\n, \\b, \\r, \\\\, \\\".\n" + //
+                                    "Offending string: " + input + "\n" + "                 " + createWhitespaceString(i) + "^");
                     }
                 }
             }
             return buffer.toString();
         }
 
+        /**
+         * Creates a String made of spaces repeated for the given amount of time.
+         * <p/>
+         * <code>createWhitespaceString(3) -> "&nbsp;&nbsp;&nbsp;" // 3 spaces</code>
+         *
+         * @param length the length of the resulting String
+         * @return a String made of a number of spaces equals to the given `length` parameter.
+         */
         private static String createWhitespaceString(int length) {
             char[] charArray = new char[length];
             Arrays.fill(charArray, ' ');
             return String.valueOf(charArray);
         }
 
+        /**
+         * Counts the number of occurrences of a String in an other String.
+         *
+         * @param str the String to search in.
+         * @param needle the String to count the occurrences of.
+         * @return the number of occurrences found.
+         */
         public static int countOccurences(String str, String needle) {
             int index = 0, count = 0;
             while (index != -1) {
@@ -101,6 +128,11 @@ public class Util {
         }
     }
 
+    /**
+     * Utilities around File to String conversions.
+     * <p/>
+     * Note: This is to avoid dependency on Apache commons for such limited features.
+     */
     public static class FileToString {
         public static String read(File file) throws FileNotFoundException {
             return new Scanner(file).useDelimiter("\\Z").next();
