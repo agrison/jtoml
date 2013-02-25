@@ -8,14 +8,14 @@ import java.util.*;
 
 /**
  * Toml Utilities.
- * 
+ *
  * @author $Author: alexandre grison$
  */
 public class Util {
     /**
      * Helper class for handling ISO 8601 strings of the following format:
      * "2008-03-01T13:00:00+01:00". It also supports parsing the "Z" timezone.
-     * 
+     *
      * Author: wrigiel (see: http://stackoverflow.com/users/1010931/wrygiel)
      * Taken from:
      * http://stackoverflow.com/questions/2201925/converting-iso8601-
@@ -51,6 +51,9 @@ public class Util {
                 if (ch != '\\') {
                     buffer.append(ch);
                 } else {
+                    if (i == input.length() - 1) {
+                        throw new IllegalStateException("Invalid escape sequence at the end of the input.");
+                    }
                     ch = input.charAt(++i);
                     switch (ch) {
                         case '0':
