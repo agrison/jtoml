@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import sun.plugin.util.UIUtil;
 
 /**
  * Junit test for the toml example file from toml "spec"
