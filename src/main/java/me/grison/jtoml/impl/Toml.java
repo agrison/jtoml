@@ -1,4 +1,9 @@
-package me.grison.jtoml;
+package me.grison.jtoml.impl;
+
+import me.grison.jtoml.Getter;
+import me.grison.jtoml.Parser;
+import me.grison.jtoml.TomlParser;
+import me.grison.jtoml.Util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,37 +28,101 @@ import java.util.regex.Pattern;
 public class Toml implements Parser, Getter {
     Map<String, Object> context = new LinkedHashMap<String, Object>();
     final Matcher keyPathMatcher = Pattern.compile("((\\w+[.])+).*").matcher("");
+    TomlParser tomlParser;
+
+    /**
+     * Default constructor.
+     */
+    public Toml() {
+        this(null);
+    }
+
+    /**
+     * Constructor using a specific TOML parser.
+     *
+     * @param tomlParser the specific TOML parser to be used.
+     */
+    public Toml(TomlParser tomlParser) {
+        this.tomlParser = tomlParser;
+    }
 
     /**
      * Creates a TOML instance loaded with the given String.
-     * @param string the TOML String to load.
+     *
+     * @param tomlString the TOML String to load.
      * @return a TOM object instance
      */
-    public static Toml parse(String string) {
-        return new Toml().parseString(string);
+    public static Toml parse(String tomlString) {
+        return parse(tomlString, null);
+    }
+
+    /**
+     * Creates a TOML instance loaded with the given file and using the given TOML parser.
+     *
+     * @param tomlString the TOML String to load.
+     * @param tomlParser the TOML parser to use
+     * @return a TOML object instance
+     * @throws IOException
+     */
+    public static Toml parse(String tomlString, TomlParser tomlParser) {
+        return new Toml(tomlParser).parseString(tomlString);
     }
 
     /**
      * Creates a TOML instance loaded with the given file.
+     *
      * @param file the TOML file to load
      * @return a TOML object instance
      * @throws IOException
      */
     public static Toml parse(File file) throws IOException {
-        return new Toml().parseFile(file);
+        return parse(file, null);
+    }
+
+    /**
+     * Creates a TOML instance loaded with the given file and using the given TOML parser.
+     *
+     * @param file the TOML file to load
+     * @param tomlParser the TOML parser to use
+     * @return a TOML object instance
+     * @throws IOException
+     */
+    public static Toml parse(File file, TomlParser tomlParser) throws IOException {
+        return new Toml(tomlParser).parseFile(file);
     }
 
     @Override
     public Toml parseString(String string) {
-        context = TomlParser.parse(string);
+        context = internalParser().parse(string);
         return this;
     }
 
 	@Override
 	public Toml parseFile(File file) throws FileNotFoundException {
-		context = TomlParser.parse(Util.FileToString.read(file));
-		return this;
+        return parseString(Util.FileToString.read(file));
 	}
+
+    /**
+     * Gets the parser currently used to parse TOML.
+     * Fallback to a new instance of {@link BuiltinTomlParser} if not defined.
+     *
+     * @return the current TOML parser.
+     */
+    private TomlParser internalParser() {
+        // fallback
+        if (this.tomlParser == null) {
+            this.tomlParser = new BuiltinTomlParser();
+        }
+        return this.tomlParser;
+    }
+
+    /**
+     * Gets the parser currently used to parse TOML.
+     * @return the current TOML parser.
+     */
+    public TomlParser getTomlParser() {
+        return this.tomlParser;
+    }
 
     /**
      * Get the path to a key.
@@ -74,11 +143,31 @@ public class Toml implements Parser, Getter {
         }
     }
 
+    /**
+     * Find the correct level context.
+     * findContext({"foo": {"bar": "hello"}}, "foo.bar")
+     * -> "hello"
+     *
+     * @param context the context
+     * @param key the key
+     * @return the context
+     */
+    public Map<String, Object> findContext(Map<String, Object> context, String key) {
+        Map<String, Object> visitor = context;
+        for (String part: key.split("[.]")) {
+            if (!visitor.containsKey(part)) {
+                return null;
+            }
+            visitor = (Map<String, Object>)visitor.get(part);
+        }
+        return visitor;
+    }
+
     @Override
     public Object get(String key) {
         if (key.contains(".")) {
             String keyPath = keyPath(key);
-            return TomlParser.findContext(context, keyPath).get(key.replace(keyPath + ".", ""));
+            return findContext(context, keyPath).get(key.replace(keyPath + ".", ""));
         } else {
             return context.get(key);
         }

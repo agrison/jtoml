@@ -1,5 +1,6 @@
 package me.grison.jtoml;
 
+import me.grison.jtoml.impl.Toml;
 import org.junit.Assert;
 import org.junit.Test;
 

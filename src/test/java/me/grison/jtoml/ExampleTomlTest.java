@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import me.grison.jtoml.impl.Toml;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
