@@ -2,7 +2,7 @@ TOML for Java
 ===
 This is a parser for Tom Preson-Werner's (@mojombo) [TOML](https://raw.github.com/mojombo/toml/) markup language, using Java.
 
-Usage:
+Usage
 ----
 ```java
 Toml toml = Toml.parse("pi = 3.14\nfoo = \"bar\""); // parse a String
@@ -18,11 +18,11 @@ toml.getInt("foo"); // Integer
 toml.getList("foo"); // List<Object>
 ```
 
-Todo:
+Todo
 -----
 
 * Consider using a grammar and ANTLR for parsing instead of a hand-made one.
 
-License:
+License
 -----
 MIT.
