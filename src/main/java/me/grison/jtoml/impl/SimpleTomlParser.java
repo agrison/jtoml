@@ -81,7 +81,7 @@ public class SimpleTomlParser implements TomlParser {
                 context = createContextIfNeeded(result, groupMatcher.group(1));
             }
             Object[] val = readObject(line);
-            if (val != null)
+            if (val != null && val[0] != null)
                 context.put((String)val[0], val[1]);
         }
         return result;

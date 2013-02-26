@@ -2,6 +2,7 @@ package me.grison.jtoml;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Toml getter interface.
@@ -57,4 +58,11 @@ public interface Getter {
      * @return the boolean located at the given key.
      */
     Boolean getBoolean(String key);
+
+    /**
+     * Get a Map.
+     * @param key the key where the object is located
+     * @return the map located at the given key.
+     */
+    Map<String, Object> getMap(String key);
 }

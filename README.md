@@ -16,12 +16,14 @@ toml.getDate("foo"); // Calendar
 toml.getDouble("foo"); // Double
 toml.getLong("foo"); // Long
 toml.getList("foo"); // List<Object>
+toml.getMap("foo"); // Map<String, Object>
+toml.getAs("foo", Foo.class); // Foo
 ```
 
 Todo
 -----
 
-* Consider using a grammar and ANTLR for parsing instead of a hand-made one.
+* Consider using ANTLR or Parboiled for parsing instead of a hand-made one.
 
 License
 -----

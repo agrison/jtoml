@@ -5,6 +5,7 @@ import me.grison.jtoml.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -208,8 +209,38 @@ public class Toml implements Parser, Getter {
     }
 
     @Override
+    public Map<String, Object> getMap(String key) {
+        return get(key, Map.class);
+    }
+
+    @Override
     public Boolean getBoolean(String key) {
         return get(key, Boolean.class);
+    }
+
+    /**
+     * Get a new instance of the given Class filled with the value that can be found
+     * in the current context at the given key.
+     *
+     * @param key the key where the value is located
+     * @param clazz the class of the resulting object
+     * @param <T> the resulting object type
+     * @return the value whose key is the given parameter
+     */
+    public <T> T getAs(String key, Class<T> clazz) {
+        try {
+            T result = clazz.newInstance();
+            for (Field f: clazz.getDeclaredFields()) {
+                boolean isAccessible = f.isAccessible();
+                f.setAccessible(true);
+                f.set(result, get(key + "." + f.getName(), f.getType()));
+                f.setAccessible(isAccessible);
+            }
+            return result;
+        } catch (Throwable e) {
+            throw new IllegalArgumentException("Could not map value of key `" + key + //
+                    "` to Object of class `" + clazz.getName() + "`.", e);
+        }
     }
 
     /**
