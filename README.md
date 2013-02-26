@@ -14,7 +14,7 @@ toml.getString("foo"); // String
 toml.getBoolean("foo"); // Boolean
 toml.getDate("foo"); // Calendar
 toml.getDouble("foo"); // Double
-toml.getInt("foo"); // Integer
+toml.getLong("foo"); // Long
 toml.getList("foo"); // List<Object>
 ```
 

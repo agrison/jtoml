@@ -71,18 +71,18 @@ public class ExampleTomlTest {
 		// ports = [ 8001, 8001, 8002 ]
 		assertEquals("192.168.1.1", toml.get("database.server"));
 		assertEquals(
-				createList(Integer.valueOf(8001), Integer.valueOf(8001),
-						Integer.valueOf(8002)), toml.getList("database.ports"));
+				createList(Long.valueOf(8001), Long.valueOf(8001), Long.valueOf(8002)),
+                toml.getList("database.ports"));
 	}
 
 	@Test
-	public void testInteger() {
+	public void testLong() {
 		// [database]
 		// connection_max = 5000
 		// latency_max = 42 # this is in milliseconds
-		assertEquals(Integer.valueOf(5000),
-				toml.getInt("database.connection_max"));
-		assertEquals(Integer.valueOf(42), toml.getInt("database.latency_max"));
+		assertEquals(Long.valueOf(5000),
+				toml.getLong("database.connection_max"));
+		assertEquals(Long.valueOf(42), toml.getLong("database.latency_max"));
 	}
 
 	@Test
@@ -120,7 +120,7 @@ public class ExampleTomlTest {
 		// parsers support it
 		assertEquals(ExampleTomlTest.<Object> createList(
 				createList("gamma", "delta"),
-				createList(Integer.valueOf(1), Integer.valueOf(2))),
+				createList(Long.valueOf(1), Long.valueOf(2))),
 				toml.getList("clients.data"));
 	}
 

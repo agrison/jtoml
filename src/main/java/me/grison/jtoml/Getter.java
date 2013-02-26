@@ -24,11 +24,11 @@ public interface Getter {
     String getString(String key);
 
     /**
-     * Get the integer.
+     * Get the Long value.
      * @param key the key where the object is located
-     * @return the integer located at the given key.
+     * @return the long located at the given key.
      */
-    Integer getInt(String key);
+    Long getLong(String key);
 
     /**
      * Get the double value.

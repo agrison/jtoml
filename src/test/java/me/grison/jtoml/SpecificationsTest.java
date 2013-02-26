@@ -19,7 +19,7 @@ public class SpecificationsTest {
     @Test
     public void testInteger() {
         Toml toml = Toml.parse("foo = 42");
-        Assert.assertEquals(42, toml.getInt("foo").intValue());
+        Assert.assertEquals(42L, toml.getLong("foo").longValue());
     }
 
     @Test

@@ -193,12 +193,12 @@ public class Toml implements Parser, Getter {
     }
 
     @Override
-    public Integer getInt(String key) {
+    public Long getLong(String key) {
         Object value = get(key);
-        if (value instanceof Integer) {
-            return (Integer) value;
+        if (value instanceof Long) {
+            return (Long) value;
         } else if (value instanceof Float) {
-            return ((Float) value).intValue();
+            return ((Float) value).longValue();
         } else {
             throw illegalArg(key, value, Integer.class);
         }
