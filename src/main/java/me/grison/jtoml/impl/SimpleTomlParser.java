@@ -16,7 +16,7 @@ import java.util.regex.Matcher;
  *
  * @author <a href="mailto:a.grison@gmail.com">$Author: Alexandre Grison$</a>
  */
-public class BuiltinTomlParser implements TomlParser {
+public class SimpleTomlParser implements TomlParser {
     /** Encapsulate both a Matcher and a method to cast the retrieved value to the according type. */
     static abstract class Handler {
         // Keep them to avoid recreating it. Patterns are thread safe

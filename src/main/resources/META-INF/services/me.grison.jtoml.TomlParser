@@ -1,1 +1,1 @@
-me.grison.jtoml.impl.BuiltinTomlParser
+me.grison.jtoml.impl.SimpleTomlParser

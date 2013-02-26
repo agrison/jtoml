@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 */
 public class Toml implements Parser, Getter {
     private static final Logger LOGGER = Logger.getLogger(Toml.class.getName());
-    /** The default {@link TomlParser} loaded from {@link ServiceLoader}. Defaults to {@link BuiltinTomlParser} if none found*/
+    /** The default {@link TomlParser} loaded from {@link ServiceLoader}. Defaults to {@link SimpleTomlParser} if none found*/
     private static TomlParser defaultParser;
     /** The instance context map holding key/values parsed from a TOML String or File */
     protected Map<String, Object> context = new LinkedHashMap<String, Object>();
@@ -113,7 +113,7 @@ public class Toml implements Parser, Getter {
 
     /**
      * Gets the parser currently used to parse TOML.
-     * Fallback to a new instance of {@link BuiltinTomlParser} if not defined.
+     * Fallback to a new instance of {@link SimpleTomlParser} if not defined.
      *
      * @return the current TOML parser.
      */
@@ -258,7 +258,7 @@ public class Toml implements Parser, Getter {
 
     /**
      * Uses a ServiceLoader to locate available {@link TomlParser} on classpath.
-     * If none is found, the default {@link BuiltinTomlParser} is used
+     * If none is found, the default {@link SimpleTomlParser} is used
      *
      * @throws IllegalStateException if too much {@link TomlParser} are found on classpath.
      */
@@ -273,14 +273,14 @@ public class Toml implements Parser, Getter {
         // iterate on all available parsers
         for (TomlParser parser: parsers) {
             LOGGER.log(Level.CONFIG, "Found TomlParser instance on classpath: " + parser.getClass().getName());
-            if (BuiltinTomlParser.class.equals(parser.getClass()) && defaultParser != null) {
+            if (SimpleTomlParser.class.equals(parser.getClass()) && defaultParser != null) {
                 continue;
             }
             defaultParser = parser;
         }
         // last-chance fallback
         if (defaultParser == null) {
-            defaultParser = new BuiltinTomlParser();
+            defaultParser = new SimpleTomlParser();
             LOGGER.log(Level.WARNING, "No TomlParser service loaded, defaulting to: " + defaultParser.getClass().getName());
         }
     }
