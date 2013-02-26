@@ -130,6 +130,10 @@ public class SimpleTomlParser implements TomlParser {
             if (!visitor.containsKey(part)) {
                 visitor.put(part, new LinkedHashMap<String, Object>());
             }
+            if (!(visitor.get(part) instanceof Map)) {
+                throw new IllegalStateException(//
+                    "Overwriting a previous key is forbidden. Trying to overwrite key `" + key + "` having value `" + visitor.get(part) + "`");
+            }
             visitor = (Map<String, Object>)visitor.get(part);
         }
         return visitor;

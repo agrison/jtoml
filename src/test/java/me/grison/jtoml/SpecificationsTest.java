@@ -55,4 +55,9 @@ public class SpecificationsTest {
         Assert.assertEquals("C:\\Users\\nodejs\\templates", toml.get("right"));
         toml = Toml.parse("wrong = \"C:\\Users\\nodejs\\templates\"");
     }
+
+    @Test(expected = IllegalStateException.class)
+    public void testOverwritePreviousKey() {
+        Toml.parse("[fruit]\ntype = \"apple\"\n\n[fruit.type]\napple = \"yes\"");
+    }
 }
