@@ -99,25 +99,36 @@ public class SpecificationsTest {
         Assert.assertEquals(Double.valueOf(13.37), foo.doubleKey, 0.00001d);
         Assert.assertEquals(Boolean.TRUE, foo.booleanKey);
         Assert.assertEquals(Arrays.asList(1L, 2L, 3L), foo.listKey);
-        Assert.assertEquals("Hello", foo.bar.get("bazz"));
-        Assert.assertEquals(Long.valueOf(459), foo.bar.get("dummy"));
+        Assert.assertEquals("Hello", foo.bar.bazz);
+        Assert.assertEquals(Long.valueOf(459), foo.bar.dummy);
+        // test no root group
+        toml = Toml.parse("stringKey=\"a\"\nlongKey=42\ndoubleKey=13.37\n" + //
+                "booleanKey=true\nlistKey=[1,2,3]\n[bar]\nbazz=\"Hello\"\ndummy=459");
+        Assert.assertEquals(foo.toString(), toml.getAs("", Foo.class).toString());
     }
 
     /**
      * Simple class tested above.
      */
+    public static class Bar {
+        String bazz;
+        Long dummy;
+        @Override
+        public String toString() {
+            return bazz + dummy;
+        }
+    }
+
     public static class Foo {
         String stringKey;
         Long longKey;
         Double doubleKey;
         Boolean booleanKey;
         List<Object> listKey;
-        Map<String, Object> bar;
-
+        Bar bar;
         @Override
         public String toString() {
-            return "stringKey=" + stringKey + ", longKey=" + longKey + ", doubleKey=" + doubleKey + //
-                    ", booleanKey=" + booleanKey + ", listKey=" + listKey + ", bar=" + bar;
+            return stringKey + longKey + doubleKey + booleanKey + listKey + bar;
         }
     }
 }

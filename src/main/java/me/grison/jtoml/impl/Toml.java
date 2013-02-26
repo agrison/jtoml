@@ -175,7 +175,9 @@ public class Toml implements Parser, Getter {
 
     @Override
     public Object get(String key) {
-        if (key.contains(".")) {
+        if (key == null || "".equals(key.trim())) {
+            return context;
+        } else if (key.contains(".")) {
             String keyPath = keyPath(key);
             return findContext(context, keyPath).get(key.replace(keyPath + ".", ""));
         } else {
@@ -231,10 +233,11 @@ public class Toml implements Parser, Getter {
         try {
             T result = clazz.newInstance();
             for (Field f: clazz.getDeclaredFields()) {
-                boolean isAccessible = f.isAccessible();
-                f.setAccessible(true);
-                f.set(result, get(key + "." + f.getName(), f.getType()));
-                f.setAccessible(isAccessible);
+                Class<?> fieldType = f.getType();
+                String fieldName = (key == null || "".equals(key.trim())) ? f.getName() : key + "." + f.getName();
+                Object fieldValue = Util.Reflection.isTomlSupportedType(fieldType) ? //
+                        get(fieldName, fieldType) : getAs(fieldName, fieldType);
+                Util.Reflection.setFieldValue(f, result, fieldValue);
             }
             return result;
         } catch (Throwable e) {

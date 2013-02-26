@@ -2,6 +2,7 @@ package me.grison.jtoml;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -141,6 +142,40 @@ public class Util {
     public static class FileToString {
         public static String read(File file) throws FileNotFoundException {
             return new Scanner(file).useDelimiter("\\Z").next();
+        }
+    }
+
+    /**
+     * Utilities around Reflection.
+     */
+    public static class Reflection {
+        /** List of types supported Natively by TOML + Map */
+        static final Set<Class<?>> TOML_SUPPORTED = new HashSet<Class<?>>(Arrays.asList(Long.class, Double.class, //
+                Calendar.class, Boolean.class, String.class, List.class, Map.class));
+
+        /**
+         * Returns whether the given type is a built-in toml supported type.
+         *
+         * @param clazz a class object.
+         * @return whether it is a built-in toml type
+         */
+        public static boolean isTomlSupportedType(Class<?> clazz) {
+            return TOML_SUPPORTED.contains(clazz);
+        }
+
+        /**
+         * Set the value of the given field on given object.
+         *
+         * @param field the field
+         * @param object the object
+         * @param value the value
+         * @throws IllegalAccessException
+         */
+        public static void setFieldValue(Field field, Object object, Object value) throws IllegalAccessException {
+            boolean isAccessible = field.isAccessible();
+            field.setAccessible(true);
+            field.set(object, value);
+            field.setAccessible(isAccessible);
         }
     }
 }
