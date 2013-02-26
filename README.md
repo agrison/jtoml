@@ -17,7 +17,16 @@ toml.getDouble("foo"); // Double
 toml.getLong("foo"); // Long
 toml.getList("foo"); // List<Object>
 toml.getMap("foo"); // Map<String, Object>
-toml.getAs("foo", Foo.class); // Foo
+
+// or Custom objects
+public class Player {
+    String nickName;
+    Long score;
+}
+toml = Toml.parse("[player]\nnickName = \"foo\"\nscore = 42");
+Player player = toml.getAs("player", Player.class);
+player.nickName; // "foo"
+player.score; // 42L
 ```
 
 Todo
