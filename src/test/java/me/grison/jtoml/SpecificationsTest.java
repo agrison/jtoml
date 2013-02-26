@@ -60,4 +60,22 @@ public class SpecificationsTest {
     public void testOverwritePreviousKey() {
         Toml.parse("[fruit]\ntype = \"apple\"\n\n[fruit.type]\napple = \"yes\"");
     }
+
+    @Test
+    public void testNull() {
+        Toml toml = Toml.parse("foo = 1337");
+        Assert.assertEquals(null, toml.get("bar"));
+        Assert.assertEquals(null, toml.getString("bar"));
+        Assert.assertEquals(null, toml.getLong("bar"));
+        Assert.assertEquals(null, toml.getDouble("bar"));
+        Assert.assertEquals(null, toml.getDate("bar"));
+        Assert.assertEquals(null, toml.getBoolean("bar"));
+        Assert.assertEquals(null, toml.getList("bar"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testIncompatibleType() {
+        Toml toml = Toml.parse("foo = 1337");
+        toml.getString("foo");
+    }
 }

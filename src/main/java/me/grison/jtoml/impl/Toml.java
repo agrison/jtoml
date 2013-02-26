@@ -184,63 +184,51 @@ public class Toml implements Parser, Getter {
 
     @Override
     public String getString(String key) {
-        Object value = get(key);
-        if (value instanceof String) {
-            return (String) value;
-        } else {
-            throw illegalArg(key, value, String.class);
-        }
+        return get(key, String.class);
     }
 
     @Override
     public Long getLong(String key) {
-        Object value = get(key);
-        if (value instanceof Long) {
-            return (Long) value;
-        } else if (value instanceof Float) {
-            return ((Float) value).longValue();
-        } else {
-            throw illegalArg(key, value, Integer.class);
-        }
+        return get(key, Long.class);
     }
 
     @Override
     public Double getDouble(String key) {
-        Object value = get(key);
-        if (value instanceof Double) {
-            return (Double) value;
-        } else {
-            throw illegalArg(key, value, Double.class);
-        }
+        return get(key, Double.class);
     }
 
     @Override
     public Calendar getDate(String key) {
-        Object value = get(key);
-        if (value instanceof Calendar) {
-            return (Calendar) value;
-        } else {
-            throw illegalArg(key, value, Calendar.class);
-        }
+        return get(key, Calendar.class);
     }
 
     @Override
     public List<Object> getList(String key) {
-        Object value = get(key);
-        if (value instanceof List) {
-            return (List) value;
-        } else {
-            throw illegalArg(key, value, List.class);
-        }
+        return get(key, List.class);
     }
 
     @Override
     public Boolean getBoolean(String key) {
+        return get(key, Boolean.class);
+    }
+
+    /**
+     * Get the value whose key is the given parameter from the context map and cast it to the given class.
+     * <p>Returns null if the value is null.</p>
+     *
+     * @param key the key to search the value for.
+     * @param clazz the class of the resulting object
+     * @param <T> the resulting object type
+     * @return the value whose key is the given parameter, <code>null</code> if not found
+     */
+    private <T> T get(String key, Class<T> clazz) {
         Object value = get(key);
-        if (value instanceof Boolean) {
-            return (Boolean) value;
+        if (value == null) {
+            return null;
+        } else if (clazz.isInstance(value)) {
+            return (T) value;
         } else {
-            throw illegalArg(key, value, Boolean.class);
+            throw illegalArg(key, value, clazz);
         }
     }
 
