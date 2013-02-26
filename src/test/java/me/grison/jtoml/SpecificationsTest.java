@@ -56,7 +56,7 @@ public class SpecificationsTest {
         toml = Toml.parse("wrong = \"C:\\Users\\nodejs\\templates\"");
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testOverwritePreviousKey() {
         Toml.parse("[fruit]\ntype = \"apple\"\n\n[fruit.type]\napple = \"yes\"");
     }
