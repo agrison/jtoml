@@ -46,4 +46,13 @@ public class SpecificationsTest {
         Toml toml = Toml.parse("foo = [\n\"Hello\",\n\n\t \"World\"\n,\"Nice\"]");
         Assert.assertEquals(Arrays.asList("Hello", "World", "Nice"), toml.getList("foo"));
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testWrongStringEscaping() {
+        // wrong = "C:\Users\nodejs\templates" # note: doesn't produce a valid path
+        // right = "C:\\Users\\nodejs\\templates"
+        Toml toml = Toml.parse("right = \"C:\\\\Users\\\\nodejs\\\\templates\"");
+        Assert.assertEquals("C:\\Users\\nodejs\\templates", toml.get("right"));
+        toml = Toml.parse("wrong = \"C:\\Users\\nodejs\\templates\"");
+    }
 }

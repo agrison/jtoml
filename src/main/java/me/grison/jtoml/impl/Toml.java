@@ -1,17 +1,13 @@
 package me.grison.jtoml.impl;
 
-import me.grison.jtoml.Getter;
-import me.grison.jtoml.Parser;
-import me.grison.jtoml.TomlParser;
-import me.grison.jtoml.Util;
+import me.grison.jtoml.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,9 +22,22 @@ import java.util.regex.Pattern;
  * @author <a href="mailto:a.grison@gmail.com">$Author: Alexandre Grison$</a>
 */
 public class Toml implements Parser, Getter {
-    Map<String, Object> context = new LinkedHashMap<String, Object>();
-    final Matcher keyPathMatcher = Pattern.compile("((\\w+[.])+).*").matcher("");
-    TomlParser tomlParser;
+    private static final Logger LOGGER = Logger.getLogger(Toml.class.getName());
+    /** The default {@link TomlParser} loaded from {@link ServiceLoader}. Defaults to {@link BuiltinTomlParser} if none found*/
+    private static TomlParser defaultParser;
+    /** The instance context map holding key/values parsed from a TOML String or File */
+    protected Map<String, Object> context = new LinkedHashMap<String, Object>();
+    /** A matcher to retrieve the path to a key. */
+    protected final Matcher keyPathMatcher = Pattern.compile("((\\w+[.])+).*").matcher("");
+    /** Current instance parser: default to `Toml.defaultParser` if none specified */
+    protected TomlParser tomlParser;
+
+    /**
+     * Retrieve a TomlParser on classpath.
+     */
+    static {
+        initDefaultParser();
+    }
 
     /**
      * Default constructor.
@@ -111,7 +120,7 @@ public class Toml implements Parser, Getter {
     private TomlParser internalParser() {
         // fallback
         if (this.tomlParser == null) {
-            this.tomlParser = new BuiltinTomlParser();
+            this.tomlParser = defaultParser;
         }
         return this.tomlParser;
     }
@@ -244,6 +253,35 @@ public class Toml implements Parser, Getter {
      */
     private IllegalArgumentException illegalArg(String key, Object value, Class<?> expected) {
        return new IllegalArgumentException(String.format("Value for key `%s` is `%s`%s.", //
-               key, value, (value == null ? "" : ". Expected type was " + expected.getName() + "`")));
+               key, value, (value == null ? "" : ". Expected type was `" + expected.getName() + "`")));
+    }
+
+    /**
+     * Uses a ServiceLoader to locate available {@link TomlParser} on classpath.
+     * If none is found, the default {@link BuiltinTomlParser} is used
+     *
+     * @throws IllegalStateException if too much {@link TomlParser} are found on classpath.
+     */
+    private static void initDefaultParser() {
+        List<TomlParser> parsers = new ArrayList<TomlParser>();
+        Iterator<TomlParser> parserIterator = ServiceLoader.load(TomlParser.class).iterator();
+        while(parserIterator.hasNext()) parsers.add(parserIterator.next());
+        // check too much (built-in one always available + one additional is OK)
+        if (parsers.size() > 2) {
+            throw new IllegalStateException("Too much TomlParser found on classpath: " + parsers);
+        }
+        // iterate on all available parsers
+        for (TomlParser parser: parsers) {
+            LOGGER.log(Level.CONFIG, "Found TomlParser instance on classpath: " + parser.getClass().getName());
+            if (BuiltinTomlParser.class.equals(parser.getClass()) && defaultParser != null) {
+                continue;
+            }
+            defaultParser = parser;
+        }
+        // last-chance fallback
+        if (defaultParser == null) {
+            defaultParser = new BuiltinTomlParser();
+            LOGGER.log(Level.WARNING, "No TomlParser service loaded, defaulting to: " + defaultParser.getClass().getName());
+        }
     }
 }

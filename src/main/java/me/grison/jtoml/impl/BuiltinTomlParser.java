@@ -3,12 +3,9 @@ package me.grison.jtoml.impl;
 import me.grison.jtoml.TomlParser;
 import me.grison.jtoml.Util;
 
+import java.util.*;
 import java.util.regex.Pattern;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 
 /**
@@ -22,11 +19,19 @@ import java.util.regex.Matcher;
 public class BuiltinTomlParser implements TomlParser {
     /** Encapsulate both a Matcher and a method to cast the retrieved value to the according type. */
     static abstract class Handler {
+        // Keep them to avoid recreating it. Patterns are thread safe
+        static final Map<String, Pattern> PATTERNS = new HashMap<String, Pattern>();
         final Matcher matcher;
-        public Handler(String regex) { this.matcher = Pattern.compile(regex).matcher(""); }
+        public Handler(String regex) { this.matcher = getPattern(regex).matcher(""); }
+        public Pattern getPattern(String regex) {
+            if (!PATTERNS.containsKey(regex))
+                PATTERNS.put(regex, Pattern.compile(regex));
+            return PATTERNS.get(regex);
+        }
         Matcher matcher() { return this.matcher; }
         abstract Object cast(String v);
     }
+    // String regex utils
     private static final String SPACES = "\\s*";
     private static final String POSSIBLE_COMMENT = "(#.*)?";
     private static final String KEY_EQUALS = "(" + SPACES + "(\\w+)" + SPACES + "=" + SPACES + ")?";
@@ -36,13 +41,20 @@ public class BuiltinTomlParser implements TomlParser {
     private static final String DIGITS = "(\\d+)";
     private static final String STRING = "\"(.*)\"";
     private static final String BOOLEAN = "(true|false)";
-    private static final Matcher ARRAY_LINE_MATCHER = Pattern.compile(KEY_EQUALS + ARRAY, Pattern.DOTALL).matcher("");
-    private static final Matcher GROUP_MATCHER = Pattern.compile(SPACES + "\\[(.*)\\]" + SPACES).matcher("");
-    private static final Matcher COMMENT = Pattern.compile("(,|\"|\\])\\s*(#.*)").matcher("");
+    // Common patterns
+    private static final Pattern ARRAY_LINE_PATTERN = Pattern.compile(KEY_EQUALS + ARRAY, Pattern.DOTALL);
+    private static final Pattern GROUP_PATTERN = Pattern.compile(SPACES + "\\[(.*)\\]" + SPACES);
+    private static final Pattern COMMENT_PATTERN = Pattern.compile("(,|\"|\\])\\s*(#.*)");
+    private static final Pattern LINES_PATTERN = Pattern.compile("([^\n]+)\n?");
+    // Current instance matchers
+    private final Matcher arrayLineMatcher = ARRAY_LINE_PATTERN.matcher("");
+    private final Matcher groupMatcher = GROUP_PATTERN.matcher("");
+    private final Matcher commentMatcher = COMMENT_PATTERN.matcher("");
+    private final Matcher lineMatcher = LINES_PATTERN.matcher("");
     /** The list of handlers */
-    private static final List<Handler> HANDLERS = new ArrayList<Handler>() {{
+    private final List<Handler> handlers = new ArrayList<Handler>() {{
         // dates
-        add(new Handler(KEY_EQUALS + DATE) {Object cast(String v) { try { return Util.ISO8601.toCalendar(v); } catch (Exception e) { return null; } }});
+        add(new Handler(KEY_EQUALS + DATE) { Object cast(String v) { try { return Util.ISO8601.toCalendar(v); } catch (Exception e) { return null; } }});
         // doubles
         add(new Handler(KEY_EQUALS + DOUBLE + SPACES + POSSIBLE_COMMENT) {Object cast(String v) {return Double.valueOf(v);}});
         // integers
@@ -59,14 +71,14 @@ public class BuiltinTomlParser implements TomlParser {
         Map<String, Object> context = result;
         tomlString = prepareArrays(tomlString);
         // match lines
-        Matcher lines = Pattern.compile("([^\n]+)\n?").matcher(tomlString);
-        while (lines.find()) {
-            String line = lines.group().trim();
-            if (COMMENT.reset(line).find()) {
-                line = line.replace(COMMENT.group(2), "");
+        lineMatcher.reset(tomlString);
+        while (lineMatcher.find()) {
+            String line = lineMatcher.group().trim();
+            if (commentMatcher.reset(line).find()) {
+                line = line.replace(commentMatcher.group(2), "");
             }
-            if (GROUP_MATCHER.reset(line).matches()) {
-                context = createContextIfNeeded(result, GROUP_MATCHER.group(1));
+            if (groupMatcher.reset(line).matches()) {
+                context = createContextIfNeeded(result, groupMatcher.group(1));
             }
             Object[] val = readObject(line);
             if (val != null)
@@ -131,7 +143,7 @@ public class BuiltinTomlParser implements TomlParser {
      * @param line the line where to extract key/value
      */
     private Object[] readObject(String line) {
-        for (Handler handler: HANDLERS) {
+        for (Handler handler: this.handlers) {
             if (handler.matcher().reset(line).matches()) {
                 String key = handler.matcher().group(2);
                 Object value = handler.cast(handler.matcher().group(3));
@@ -139,9 +151,9 @@ public class BuiltinTomlParser implements TomlParser {
             }
         }
         // it might be an array
-        if (ARRAY_LINE_MATCHER.reset(line).matches()) {
-            String key = ARRAY_LINE_MATCHER.group(2);
-            String array = ARRAY_LINE_MATCHER.group(3);
+        if (arrayLineMatcher.reset(line).matches()) {
+            String key = arrayLineMatcher.group(2);
+            String array = arrayLineMatcher.group(3);
             List<Object> values = new ArrayList<Object>();
             // find nested arrays
             if (array.matches(".*(?:\\]),.*")) {
