@@ -118,4 +118,6 @@ Todo
 
 License
 -----
-MIT.
+[MIT License (MIT)](http://opensource.org/licenses/mit-license.php).
+
+See the [`LICENSE`](https://github.com/agrison/jtoml/blob/master/LICENSE) file.
