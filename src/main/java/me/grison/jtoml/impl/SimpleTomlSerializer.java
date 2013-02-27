@@ -26,16 +26,39 @@ public class SimpleTomlSerializer implements TomlSerializer {
         return serialize(null, object);
     }
 
+    private String serializeList(List<?> list) {
+        StringBuffer buffer = new StringBuffer("[");
+        final StringBuffer ibuff = new StringBuffer();
+        for (Object item: (List<?>)list) {
+            if (item instanceof List) {
+                ibuff.append(", ").append(serializeList((List<?>)item));
+            } else if (Util.Reflection.isTomlSupportedType(item.getClass())) {
+                if (converters.containsKey(item.getClass())) {
+                    ibuff.append(", ").append(converters.get(item.getClass()).convert(item));
+                } else {
+                    ibuff.append(", ").append(item);
+                }
+            }
+        }
+        if (ibuff.length() > 0) {
+            buffer.append(ibuff.substring(2));
+        }
+        buffer.append("]");
+        return buffer.toString();
+    }
+
     @Override
     public String serialize(String rootKey, Object object) {
         try {
-            StringBuffer buffer = new StringBuffer(rootKey == null ? "" : "[" + rootKey + "]\n");
-            List<Field> fields = Arrays.asList(object.getClass().getDeclaredFields());
+            final StringBuffer buffer = new StringBuffer(rootKey == null ? "" : "[" + rootKey + "]\n");
+            final List<Field> fields = Arrays.asList(object.getClass().getDeclaredFields());
             Collections.sort(fields, Util.Reflection.newTomlFieldComparator(fields));
             for (Field f : fields) {
                 Class<?> type = f.getType();
                 Object value = Util.Reflection.getFieldValue(f, object);
-                if (Util.Reflection.isTomlSupportedType(type)) {
+                if (type.equals(List.class)) {
+                    buffer.append(f.getName() + " = " + serializeList((List<?>)value) + "\n");
+                } else if (Util.Reflection.isTomlSupportedType(type)) {
                     if (converters.containsKey(type)) {
                         value = converters.get(type).convert(value);
                     }
