@@ -109,7 +109,8 @@ public class SpecificationsTest {
                 "booleanKey = true\nlistKey = [[1, 2, 3], [\"hello\", \"world\"]]\nawesome = true\n\n[foo.bar]\nbazz = \"Hello\"\ndummy = 459";
         Toml toml = Toml.parse(tomlContent);
         Foo foo = toml.getAs("foo", Foo.class);
-        Assert.assertEquals(tomlContent, toml.serialize("foo", foo).trim() /* removes last \n */);
+        Assert.assertEquals(tomlContent, Toml.serialize("foo", foo).trim() /* removes last \n */);
+        Assert.assertEquals(tomlContent, toml.serialize().trim());
     }
 
     /**

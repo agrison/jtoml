@@ -33,7 +33,7 @@ public class Toml implements Parser, Getter {
     /** Current instance parser: default to `Toml.defaultParser` if none specified */
     protected TomlParser tomlParser;
     /** Current instance serializer */
-    protected TomlSerializer tomlSerializer = new SimpleTomlSerializer();
+    private static TomlSerializer tomlSerializer = new SimpleTomlSerializer();
 
     /**
      * Retrieve a TomlParser on classpath.
@@ -270,12 +270,31 @@ public class Toml implements Parser, Getter {
     }
 
     /**
+     * Serializes the current instance context to a TOML String.
+     *
+     * @return the TOML String representing the current instance context.
+     */
+    public String serialize() {
+        return serialize(null);
+    }
+
+    /**
+     * Serializes the current instance context to a TOML String.
+     *
+     * @param rootKey the root key.
+     * @return the TOML String representing the current instance context.
+     */
+    public String serialize(String rootKey) {
+        return serialize(rootKey, this.context);
+    }
+
+    /**
      * Serializes the given Object to a TOML String.
      *
      * @param object the Object to be serialized
      * @return the TOML String representing the given Object.
      */
-    public String serialize(Object object) {
+    public static String serialize(Object object) {
         return serialize(null, object);
     }
 
@@ -286,7 +305,7 @@ public class Toml implements Parser, Getter {
      * @param object the Object to be serialized
      * @return the TOML String representing the given Object.
      */
-    public String serialize(String rootKey, Object object) {
+    public static String serialize(String rootKey, Object object) {
         return tomlSerializer.serialize(rootKey, object);
     }
 

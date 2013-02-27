@@ -33,7 +33,7 @@ toml.getMap("foo"); // Map<String, Object>
 You can map a custom type from an entire TOML String or part of it.
 Let's say you would like to map the following TOML to a `Player` entity.
 
-```ini
+```toml
 [player]
 nickName = "foo"
 score = 42
@@ -79,11 +79,11 @@ public class Car {
 Car f12Berlinetta = new Car("Ferrari", "F12 Berlinetta", true, "2012-02-29",
     360, 1525.5, Arrays.asList("GPS", "Leather", "Nitro")
 );
-String toml = new Toml().serialize("f12b", f12Berlinetta);
+String toml = Toml.serialize("f12b", f12Berlinetta);
 ```
 
 The call to `Toml.serialize()` will produce the following TOML format:
-```ini
+```toml
 [f12b]
 brand = "Ferrari"
 model = "F12 Berlinetta"
@@ -94,6 +94,19 @@ options = ["GPS", "Leather", "Nitro"]
 [f12b.stats]
 maxSpeed = 347
 weight = 1525.5
+```
+
+You can also serialize the current instance of a `Toml` object:
+```java
+Toml toml = Toml.parse("[player]\nname = \"foo\"\nscore = 42");
+toml.serialize();
+```
+
+Will produce the following TOML String
+```toml
+[player]
+name = "foo"
+score = 42
 ```
 
 **Note:** Like for custom types above, supported types are `Long`, `String`, `Double`, `Boolean`, `Calendar`, `List`, `Map` or Objects having the pre-cited types only.
