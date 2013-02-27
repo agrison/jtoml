@@ -3,11 +3,7 @@ package me.grison.jtoml;
 import me.grison.jtoml.impl.Toml;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Unit test for specifications (types).
@@ -107,12 +103,22 @@ public class SpecificationsTest {
         Assert.assertEquals(foo.toString(), toml.getAs("", Foo.class).toString());
     }
 
+    @Test
+    public void testSerialization() throws Exception {
+        String tomlContent = "[foo]\nstringKey = \"a\"\nlongKey = 42\ndoubleKey = 13.37\n" + //
+                "booleanKey = true\nlistKey = [1, 2, 3]\nawesome = true\n\n[foo.bar]\nbazz = \"Hello\"\ndummy = 459";
+        Toml toml = Toml.parse(tomlContent);
+        Foo foo = toml.getAs("foo", Foo.class);
+        Assert.assertEquals(tomlContent, toml.serialize("foo", foo).trim() /* removes last \n */);
+    }
+
     /**
      * Simple class tested above.
      */
     public static class Bar {
         String bazz;
         Long dummy;
+
         @Override
         public String toString() {
             return bazz + dummy;
@@ -126,9 +132,11 @@ public class SpecificationsTest {
         Boolean booleanKey;
         List<Object> listKey;
         Bar bar;
+        Boolean awesome;
+
         @Override
         public String toString() {
-            return stringKey + longKey + doubleKey + booleanKey + listKey + bar;
+            return stringKey + longKey + doubleKey + booleanKey + listKey + bar + awesome;
         }
     }
 }

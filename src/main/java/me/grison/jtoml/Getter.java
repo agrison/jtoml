@@ -65,4 +65,13 @@ public interface Getter {
      * @return the map located at the given key.
      */
     Map<String, Object> getMap(String key);
+
+    /**
+     * Get an object of a specific class.
+     * @param key the key where the object is located
+     * @param clazz the class of the object
+     * @param <T> the type
+     * @return the object located at the given key.
+     */
+    <T> T getAs(String key, Class<T> clazz);
 }

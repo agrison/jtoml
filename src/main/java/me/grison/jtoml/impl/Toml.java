@@ -32,6 +32,8 @@ public class Toml implements Parser, Getter {
     protected final Matcher keyPathMatcher = Pattern.compile("((\\w+[.])+).*").matcher("");
     /** Current instance parser: default to `Toml.defaultParser` if none specified */
     protected TomlParser tomlParser;
+    /** Current instance serializer */
+    protected TomlSerializer tomlSerializer = new SimpleTomlSerializer();
 
     /**
      * Retrieve a TomlParser on classpath.
@@ -229,6 +231,7 @@ public class Toml implements Parser, Getter {
      * @param <T> the resulting object type
      * @return the value whose key is the given parameter
      */
+    @Override
     public <T> T getAs(String key, Class<T> clazz) {
         try {
             T result = clazz.newInstance();
@@ -264,6 +267,27 @@ public class Toml implements Parser, Getter {
         } else {
             throw illegalArg(key, value, clazz);
         }
+    }
+
+    /**
+     * Serializes the given Object to a TOML String.
+     *
+     * @param object the Object to be serialized
+     * @return the TOML String representing the given Object.
+     */
+    public String serialize(Object object) {
+        return serialize(null, object);
+    }
+
+    /**
+     * Serializes the given Object to a TOML String.
+     *
+     * @param rootKey the root key (can be empty or null)
+     * @param object the Object to be serialized
+     * @return the TOML String representing the given Object.
+     */
+    public String serialize(String rootKey, Object object) {
+        return tomlSerializer.serialize(rootKey, object);
     }
 
     /**

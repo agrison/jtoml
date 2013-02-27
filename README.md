@@ -54,6 +54,50 @@ player.score; // 42L
 
 **Note:** Supported types are `Long`, `String`, `Double`, `Boolean`, `Calendar`, `List`, `Map` or Objects having the pre-cited types only.
 
+### Serialization
+
+JToml supports also serialization. Indeed, you can serialize a custom type to a String having the TOML format representing the original object.
+Imagine the following custom Objects:
+
+```java
+public class Stats {
+    Long maxSpeed;
+    Double weight;
+    // Constructors
+}
+
+public class Car {
+    String brand;
+    String model;
+    Stats stats;
+    Boolean legendary;
+    Calendar date;
+    List<String> options;
+    // Constructors
+}
+
+Car f12Berlinetta = new Car("Ferrari", "F12 Berlinetta", true, "2012-02-29",
+    360, 1525.5, Arrays.asList("GPS", "Leather", "Nitro")
+);
+String toml = new Toml().serialize("f12b", f12Berlinetta);
+```
+
+The call to `Toml.serialize()` will produce the following TOML format:
+```ini
+[f12b]
+brand = "Ferrari"
+model = "F12 Berlinetta"
+legendary = true
+date = 2012-02-29T00:00:00Z
+options = ["GPS", "Leather", "Nitro"]
+
+[f12b.stats]
+maxSpeed = 347
+weight = 1525.5
+```
+
+**Note:** Like for custom types above, supported types are `Long`, `String`, `Double`, `Boolean`, `Calendar`, `List`, `Map` or Objects having the pre-cited types only.
+
 Todo
 -----
 
