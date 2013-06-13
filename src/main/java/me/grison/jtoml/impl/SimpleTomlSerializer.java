@@ -91,8 +91,7 @@ public class SimpleTomlSerializer implements TomlSerializer {
                     }
                     buffer.append(f.getName() + " = " + value + "\n");
                 } else {
-                    rootKey = rootKey + "." + f.getName();
-                    buffer.append("\n" + serialize(rootKey, value));
+                    buffer.append("\n" + serialize(rootKey + "." + f.getName(), value));
                 }
             }
             return buffer.toString();

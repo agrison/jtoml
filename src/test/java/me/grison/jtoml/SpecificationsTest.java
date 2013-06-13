@@ -88,7 +88,7 @@ public class SpecificationsTest {
     @Test
     public void testCustomObject() {
         Toml toml = Toml.parse("[foo]\nstringKey=\"a\"\nlongKey=42\ndoubleKey=13.37\n" + //
-                "booleanKey=true\nlistKey=[1,2,3]\n[foo.bar]\nbazz=\"Hello\"\ndummy=459");
+                "booleanKey=true\nlistKey=[1,2,3]\n[foo.bar]\nbazz=\"Hello\"\ndummy=459\n");
         Foo foo = toml.getAs("foo", Foo.class);
         Assert.assertEquals("a", foo.stringKey);
         Assert.assertEquals(Long.valueOf(42), foo.longKey);
@@ -106,7 +106,8 @@ public class SpecificationsTest {
     @Test
     public void testSerialization() throws Exception {
         String tomlContent = "[foo]\nstringKey = \"a\"\nlongKey = 42\ndoubleKey = 13.37\n" + //
-                "booleanKey = true\nlistKey = [[1, 2, 3], [\"hello\", \"world\"]]\nawesome = true\n\n[foo.bar]\nbazz = \"Hello\"\ndummy = 459";
+                "booleanKey = true\nlistKey = [[1, 2, 3], [\"hello\", \"world\"]]\nawesome = true\n\n" +
+                "[foo.bar]\nbazz = \"Hello\"\ndummy = 459\n\n[foo.map]\none = 1\ntwo = 2";
         Toml toml = Toml.parse(tomlContent);
         Foo foo = toml.getAs("foo", Foo.class);
         Assert.assertEquals(tomlContent, Toml.serialize("foo", foo).trim() /* removes last \n */);
@@ -134,10 +135,12 @@ public class SpecificationsTest {
         List<Object> listKey;
         Bar bar;
         Boolean awesome;
+        Map<String, Integer> map;
+
 
         @Override
         public String toString() {
-            return stringKey + longKey + doubleKey + booleanKey + listKey + bar + awesome;
+            return stringKey + longKey + doubleKey + booleanKey + listKey + bar + awesome + map;
         }
     }
 }
