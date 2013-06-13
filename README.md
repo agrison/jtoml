@@ -111,10 +111,6 @@ score = 42
 
 **Note:** Like for custom types above, supported types are `Long`, `String`, `Double`, `Boolean`, `Calendar`, `List`, `Map` or Objects having the pre-cited types only.
 
-Todo
------
-
-* Consider using ANTLR or Parboiled for parsing instead of a hand-made one.
 
 License
 -----
