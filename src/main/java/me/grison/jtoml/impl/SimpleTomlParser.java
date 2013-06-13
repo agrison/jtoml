@@ -33,7 +33,7 @@ public class SimpleTomlParser implements TomlParser {
     // String regex utils
     private static final String SPACES = "\\s*";
     private static final String POSSIBLE_COMMENT = "(#.*)?";
-    private static final String KEY_EQUALS = "(" + SPACES + "(\\w+)" + SPACES + "=" + SPACES + ")?";
+    private static final String KEY_EQUALS = "(" + SPACES + "(\\w[a-zA-Z_0-9\\-]+)" + SPACES + "=" + SPACES + ")?";
     private static final String ARRAY = SPACES + "\\[" + SPACES + "(.*)" + SPACES + "\\]" + SPACES;
     private static final String DATE = "(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*)";
     private static final String DOUBLE = "([-+]?\\d*\\.\\d+([eE][-+]?\\d+)?)";
@@ -176,6 +176,18 @@ public class SimpleTomlParser implements TomlParser {
                         values.add(nested[1]);
                 }
             }
+            // Check all values have the same type
+            if (values != null && values.size() > 0) {
+                Set<Class<?>> types = new HashSet<Class<?>>();
+                for (Object o : values) {
+                    types.add(o.getClass());
+                }
+                if (types.size() > 1) {
+                    throw new IllegalArgumentException("Inconsistent types found while parsing array. " + //
+                            "Found all the following types in the same array declaration: " + types);
+                }
+            }
+            //System.out.println("------> " + key + "=" + values);
             return new Object[] { key, values };
         }
         return null;

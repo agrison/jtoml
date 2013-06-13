@@ -92,6 +92,12 @@ public class Util {
                     ch = input.charAt(++i);
                     if (UNESCAPE.containsKey(ch)) {
                         buffer.append(UNESCAPE.get(ch));
+                    } else if (ch == 'u') {
+                        String unicodeHexValue = String.valueOf(input.charAt(++i)) + String.valueOf(input.charAt(++i)) +
+                                String.valueOf(input.charAt(++i)) + String.valueOf(input.charAt(++i));
+                        if (unicodeHexValue.matches("[0-9a-fA-F]{4}")) {
+                            buffer.append((char)Integer.parseInt(unicodeHexValue, 16));
+                        }
                     } else {
                         throw new IllegalArgumentException("Escape sequence \\ " + ch + " in isn't known. " + //
                                 "Known sequences are: " + "\\0, \\t, \\n, \\b, \\r, \\\\, \\\".\n" + //
@@ -124,6 +130,8 @@ public class Util {
                 char ch = input.charAt(i);
                 if (ESCAPE.containsKey(ch)) {
                     buffer.append("\\").append(ESCAPE.get(ch));
+                } else if ((ch >= 0x00 && ch < 0x20 /* SPACE */) || (ch >= 0x7F /* DEL and above */)) {
+                    buffer.append("\\u").append(Integer.toHexString(ch));
                 } else {
                     buffer.append(ch);
                 }
@@ -172,7 +180,11 @@ public class Util {
      */
     public static class FileToString {
         public static String read(File file) throws FileNotFoundException {
-            return new Scanner(file).useDelimiter("\\Z").next();
+            try {
+                return new Scanner(file).useDelimiter("\\Z").next();
+            } catch (NoSuchElementException e) {
+                return "";
+            }
         }
     }
 

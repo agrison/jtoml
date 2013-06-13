@@ -35,14 +35,19 @@ public class SpecificationsTest {
 
     @Test
     public void testString() {
-        Toml toml = Toml.parse("foo = \"Hello\\tWorld\\nI'm having \\\"!\"");
-        Assert.assertEquals("Hello\tWorld\nI'm having \"!", toml.getString("foo"));
+        Toml toml = Toml.parse("foo = \"Hello\\tWorld\\nI'm having \\u0061 good time \\u263a \\\"!\"");
+        Assert.assertEquals("Hello\tWorld\nI'm having a good time ☺ \"!", toml.getString("foo"));
     }
 
     @Test
     public void testArray() {
         Toml toml = Toml.parse("foo = [\n\"Hello\",\n\n\t \"World\"\n,\"Nice\"]");
         Assert.assertEquals(Arrays.asList("Hello", "World", "Nice"), toml.getList("foo"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInconsistentArray() {
+        Toml.parse("foo = [1, true, \"Hello\"]");
     }
 
     @Test(expected = IllegalArgumentException.class)
