@@ -181,8 +181,8 @@ public class Util {
      */
     public static class Reflection {
         /** List of types supported Natively by TOML + Map */
-        static final Set<Class<?>> TOML_SUPPORTED = new HashSet<Class<?>>(Arrays.asList(Long.class, Double.class, //
-                Calendar.class, Boolean.class, String.class, List.class, Map.class));
+        static final Set<Class<?>> TOML_SUPPORTED = new HashSet<Class<?>>(Arrays.asList(Integer.class, //
+            Long.class, Double.class, Calendar.class, Boolean.class, String.class, List.class, Map.class));
 
         /**
          * Returns whether the given type is a built-in toml supported type.
