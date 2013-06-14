@@ -132,6 +132,12 @@ public class ExampleTomlTest {
 		return calendar;
 	}
 
+    @Test
+    /** Should not crash :) */
+    public void testIssue10() {
+        Toml.serialize("something", "hello");
+    }
+
 	private static <T> List<T> createList(T... elements) {
 		return Arrays.<T> asList(elements);
 	}

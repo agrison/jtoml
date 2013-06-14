@@ -4,6 +4,7 @@ import me.grison.jtoml.TomlSerializer;
 import me.grison.jtoml.Util;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
@@ -19,6 +20,7 @@ public class SimpleTomlSerializer implements TomlSerializer {
     private Map<Class<?>, Converter> converters = new HashMap<Class<?>, Converter>() {{
         put(String.class, new Converter() {@Override public String convert(Object o) { return "\"" + Util.TomlString.escape((String)o) + "\""; }});
         put(Calendar.class, new Converter() {@Override public String convert(Object o) { return Util.ISO8601.fromCalendar((Calendar)o); }});
+        put(char[].class, new Converter() {@Override public String convert(Object o) { return get(String.class).convert(String.valueOf((char[])o)); }});
     }};
 
     @Override
