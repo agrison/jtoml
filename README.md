@@ -4,6 +4,33 @@ This is a parser for Tom Preson-Werner's (@mojombo) [TOML](https://raw.github.co
 
 [![Build Status](https://travis-ci.org/agrison/jtoml.png?branch=master)](https://travis-ci.org/agrison/jtoml)
 
+Get it
+----
+
+jtoml is published in the sonatype nexus snapshots repository. In order to use it, you may add this repository in your `pom.xml`:
+
+```xml
+<repositories>
+  <repository>
+    <id>sonatype-nexus-snapshots</id>
+    <url>https://oss.sonatype.org/content/groups/public/</url>
+    <snapshots>
+      <enabled>true</enabled>
+    </snapshots>
+  </repository>
+</repositories>
+```
+
+Add the jtoml dependency:
+
+```xml
+<dependency>
+  <groupId>me.grison</groupId>
+  <artifactId>jtoml</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
+
 Usage
 ----
 

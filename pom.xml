@@ -12,7 +12,7 @@
 
     <groupId>me.grison</groupId>
     <artifactId>jtoml</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>jtoml</name>
     <description>TOML for Java</description>
@@ -36,6 +36,14 @@
         <system>Github Issues</system>
         <url>https://github.com/agrison/jtoml/issues</url>
     </issueManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>sonatype-nexus-snapshot</id>
+            <name>Nexus Snapshot Repository</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </repository>
+    </distributionManagement>
 
     <developers>
         <developer>
@@ -101,19 +109,6 @@
                             </execution>
                         </executions>
                     </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>release-sign-artifacts</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
