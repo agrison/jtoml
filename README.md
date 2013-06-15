@@ -7,13 +7,15 @@ This is a parser for Tom Preson-Werner's (@mojombo) [TOML](https://raw.github.co
 Get it
 ----
 
-jtoml is published in the sonatype nexus snapshots repository. In order to use it, you may add this repository in your `pom.xml`:
+jtoml is published in the sonatype nexus repository.
+In order to use it, you may add this repository in your `pom.xml`:
 
 ```xml
 <repositories>
   <repository>
     <id>sonatype-nexus-snapshots</id>
     <url>https://oss.sonatype.org/content/groups/public/</url>
+    <!-- If you want snapshots versions -->
     <snapshots>
       <enabled>true</enabled>
     </snapshots>
@@ -27,7 +29,7 @@ Add the jtoml dependency:
 <dependency>
   <groupId>me.grison</groupId>
   <artifactId>jtoml</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 
