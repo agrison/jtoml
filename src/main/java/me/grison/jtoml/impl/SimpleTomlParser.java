@@ -33,7 +33,7 @@ public class SimpleTomlParser implements TomlParser {
     // String regex utils
     private static final String SPACES = "\\s*";
     private static final String POSSIBLE_COMMENT = "(#.*)?";
-    private static final String KEY_EQUALS = "(" + SPACES + "(\\w[a-zA-Z_0-9\\-]+)" + SPACES + "=" + SPACES + ")?";
+    private static final String KEY_EQUALS = "(" + SPACES + "(\\w[a-zA-Z_0-9\\-]*)" + SPACES + "=" + SPACES + ")?";
     private static final String ARRAY = SPACES + "\\[" + SPACES + "(.*)" + SPACES + "\\]" + SPACES;
     private static final String DATE = "(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*)";
     private static final String DOUBLE = "([-+]?\\d*\\.\\d+([eE][-+]?\\d+)?)";
@@ -50,6 +50,7 @@ public class SimpleTomlParser implements TomlParser {
     private final Matcher groupMatcher = GROUP_PATTERN.matcher("");
     private final Matcher commentMatcher = COMMENT_PATTERN.matcher("");
     private final Matcher lineMatcher = LINES_PATTERN.matcher("");
+
     /** The list of handlers */
     private final List<Handler> handlers = new ArrayList<Handler>() {{
         // dates

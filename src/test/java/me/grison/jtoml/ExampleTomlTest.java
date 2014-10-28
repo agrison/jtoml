@@ -139,6 +139,12 @@ public class ExampleTomlTest {
     }
 
     @Test
+    public void testSingleCharacterKey() {
+        Toml t = Toml.parse("a = \"Some awesome value\"");
+        assertEquals(t.getString("a"), "Some awesome value");
+    }
+
+    @Test
     /** Should not crash :) */
     public void testIssue10() {
         Toml.serialize("something", "hello");
