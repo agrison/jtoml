@@ -40,6 +40,14 @@ public class SpecificationsTest {
     }
 
     @Test
+    public void testMultiLineString() {
+        Toml toml = Toml.parse("foo = \"\"\"Hello\nWorld\nfoo\tbar\"\"\"");
+        Assert.assertEquals("Hello\nWorld\nfoo\tbar", toml.getString("foo"));
+        toml = Toml.parse("foo = \"\"\"\nHello\nWorld\nfoo\tbar\"\"\"");
+        Assert.assertEquals("Hello\nWorld\nfoo\tbar", toml.getString("foo"));
+    }
+
+    @Test
     public void testArray() {
         Toml toml = Toml.parse("foo = [\n\"Hello\",\n\n\t \"World\"\n,\"Nice\"]");
         Assert.assertEquals(Arrays.asList("Hello", "World", "Nice"), toml.getList("foo"));
