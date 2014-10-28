@@ -39,7 +39,6 @@ public class SimpleTomlParser implements TomlParser {
     private static final String DOUBLE = "([-+]?\\d*\\.\\d+([eE][-+]?\\d+)?)";
     private static final String DIGITS = "(-?\\d+)";
     private static final String STRING = "\"(.*)\"";
-    private static final String ML_STRING = "\"\"\"(.*)\"\"\"";
     private static final String BOOLEAN = "(true|false)";
     // Common patterns
     private static final Pattern ARRAY_LINE_PATTERN = Pattern.compile(KEY_EQUALS + ARRAY, Pattern.DOTALL);
@@ -47,6 +46,7 @@ public class SimpleTomlParser implements TomlParser {
     private static final Pattern COMMENT_PATTERN = Pattern.compile("(,|\"|\\])\\s*(#.*)");
     private static final Pattern LINES_PATTERN = Pattern.compile("([^\n]+)\n?");
     private static final Pattern ML_STRING_PATTERN = Pattern.compile("\"\"\"(.*?)\"\"\"", Pattern.DOTALL);
+    private static final Pattern ML_STRING_BREAKS = Pattern.compile("\\\\$\\s*", Pattern.DOTALL);
     // Current instance matchers
     private final Matcher arrayLineMatcher = ARRAY_LINE_PATTERN.matcher("");
     private final Matcher groupMatcher = GROUP_PATTERN.matcher("");
@@ -71,9 +71,7 @@ public class SimpleTomlParser implements TomlParser {
     public Map<String, Object> parse(String tomlString) {
         Map<String, Object> result = new LinkedHashMap<String, Object>();
         Map<String, Object> context = result;
-        System.out.println("BEFORE: " + tomlString);
         tomlString = prepareMultiLineStrings(tomlString);
-        System.out.println("AFTER " + tomlString);
         tomlString = prepareArrays(tomlString);
         // match lines
         lineMatcher.reset(tomlString);
@@ -129,6 +127,8 @@ public class SimpleTomlParser implements TomlParser {
         StringBuffer b = new StringBuffer();
         while (m.find()) {
             String inside = m.group(1);
+            // find \s
+            inside = inside.replaceAll("\\\\\\s*", "");
             m.appendReplacement(b, "\"" + (inside.startsWith("\n") ? inside.substring(1) : inside).replaceAll("\n", "\\\\\\\\n") + "\"");
         }
         m.appendTail(b);
@@ -169,7 +169,6 @@ public class SimpleTomlParser implements TomlParser {
     private Object[] readObject(String line) {
         for (Handler handler: this.handlers) {
             if (handler.matcher().reset(line).matches()) {
-                System.out.println("matches [" + line + "]");
                 String key = handler.matcher().group(2);
                 Object value = handler.cast(handler.matcher().group(3));
                 return new Object[] { key, value };

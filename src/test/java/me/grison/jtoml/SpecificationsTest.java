@@ -45,6 +45,13 @@ public class SpecificationsTest {
         Assert.assertEquals("Hello\nWorld\nfoo\tbar", toml.getString("foo"));
         toml = Toml.parse("foo = \"\"\"\nHello\nWorld\nfoo\tbar\"\"\"");
         Assert.assertEquals("Hello\nWorld\nfoo\tbar", toml.getString("foo"));
+        toml = Toml.parse("foo = \"\"\"\nHello\nWorld \\       \nfoo\tbar\"\"\"");
+        Assert.assertEquals("Hello\nWorld foo\tbar", toml.getString("foo"));
+        toml = Toml.parse("foo = \"\"\"\\" +
+                "       The quick brown \\\n" +
+                "       fox jumps over \\\n" +
+                "       the lazy dog.\"\"\"");
+        Assert.assertEquals("The quick brown fox jumps over the lazy dog.", toml.getString("foo"));
     }
 
     @Test
