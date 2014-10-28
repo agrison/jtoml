@@ -37,7 +37,7 @@ public class SimpleTomlParser implements TomlParser {
     private static final String ARRAY = SPACES + "\\[" + SPACES + "(.*)" + SPACES + "\\]" + SPACES;
     private static final String DATE = "(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*)";
     private static final String DOUBLE = "([-+]?\\d*\\.\\d+([eE][-+]?\\d+)?)";
-    private static final String DIGITS = "(\\d+)";
+    private static final String DIGITS = "(-?\\d+)";
     private static final String STRING = "\"(.*)\"";
     private static final String BOOLEAN = "(true|false)";
     // Common patterns

@@ -133,6 +133,12 @@ public class ExampleTomlTest {
 	}
 
     @Test
+    public void testNegativeIntegerInTable() {
+        Toml t = Toml.parse("[a]\ncd = -3");
+        assertEquals(t.getMap("a").get("cd"), -3L);
+    }
+
+    @Test
     /** Should not crash :) */
     public void testIssue10() {
         Toml.serialize("something", "hello");
