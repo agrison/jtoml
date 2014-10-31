@@ -5,6 +5,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import java.util.*;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Unit test for specifications (types).
  *
@@ -132,6 +134,18 @@ public class SpecificationsTest {
         Foo foo = toml.getAs("foo", Foo.class);
         Assert.assertEquals(tomlContent, Toml.serialize("foo", foo).trim() /* removes last \n */);
         Assert.assertEquals(tomlContent, toml.serialize().trim());
+    }
+
+    @Test
+    public void testNegativeIntegerInTable() {
+        Toml t = Toml.parse("[a]\ncd = -3");
+        assertEquals(t.getMap("a").get("cd"), -3L);
+    }
+
+    @Test
+    public void testSingleCharacterKey() {
+        Toml t = Toml.parse("a = \"Some awesome value\"");
+        assertEquals(t.getString("a"), "Some awesome value");
     }
 
     /**
