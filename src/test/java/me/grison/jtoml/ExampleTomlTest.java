@@ -124,6 +124,11 @@ public class ExampleTomlTest {
 				toml.getList("clients.data"));
 	}
 
+    @Test
+    public void testAccentedCharacter() {
+        assertEquals("Some accentéd client", toml.getString("clients.accented"));
+    }
+
 	private static Calendar createCalendar(String pattern, String value)
 			throws ParseException {
 		Date date = new SimpleDateFormat(pattern).parse(value);

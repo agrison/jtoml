@@ -1,8 +1,8 @@
 package me.grison.jtoml;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -179,10 +179,20 @@ public class Util {
      * Note: This is to avoid dependency on Apache commons for such limited features.
      */
     public static class FileToString {
-        public static String read(File file) throws FileNotFoundException {
+        public static String read(File file)
+                throws FileNotFoundException {
             try {
-                return new Scanner(file).useDelimiter("\\Z").next();
-            } catch (NoSuchElementException e) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF8"));
+
+                String str;
+                StringBuilder b = new StringBuilder();
+                while ((str = in.readLine()) != null) {
+                    b.append(str).append("\n");
+                }
+                in.close();
+
+                return b.toString();
+            } catch (Exception e) {
                 return "";
             }
         }
