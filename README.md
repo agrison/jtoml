@@ -1,6 +1,6 @@
 TOML for Java
 ===
-This is a parser for Tom Preson-Werner's (@mojombo) [TOML](https://raw.github.com/mojombo/toml/) markup language, using Java.
+This is a parser for Tom Preson-Werner's (@mojombo) [TOML](https://github.com/toml-lang/toml) markup language, using Java.
 
 [![Build Status](https://travis-ci.org/agrison/jtoml.png?branch=master)](https://travis-ci.org/agrison/jtoml)
 
