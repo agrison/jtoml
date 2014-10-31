@@ -145,7 +145,6 @@ public class SimpleTomlParser implements TomlParser {
         while (m.find()) {
             String inside = m.group(1);
             String replacement = (inside.startsWith("\n") ? inside.substring(1) : inside).replaceAll("\n", multiLineLiteralStringNewLine);
-            System.out.println("Scanning " + inside + " -> " + replacement);
             m.appendReplacement(b, "'''" + replacement.replaceAll("\\\\", "\\\\\\\\") + "'''");
         }
         m.appendTail(b);
