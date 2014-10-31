@@ -39,6 +39,8 @@ public class SimpleTomlParser implements TomlParser {
     private static final String DOUBLE = "([-+]?\\d*\\.\\d+([eE][-+]?\\d+)?)";
     private static final String DIGITS = "(-?\\d+)";
     private static final String STRING = "\"(.*)\"";
+    private static final String LITERAL_STRING = "'(.*)'";
+    private static final String ML_LITERAL_STRING = "'''(.*?)'''";
     private static final String BOOLEAN = "(true|false)";
     // Common patterns
     private static final Pattern ARRAY_LINE_PATTERN = Pattern.compile(KEY_EQUALS + ARRAY, Pattern.DOTALL);
@@ -46,12 +48,14 @@ public class SimpleTomlParser implements TomlParser {
     private static final Pattern COMMENT_PATTERN = Pattern.compile("(,|\"|\\])\\s*(#.*)");
     private static final Pattern LINES_PATTERN = Pattern.compile("([^\n]+)\n?");
     private static final Pattern ML_STRING_PATTERN = Pattern.compile("\"\"\"(.*?)\"\"\"", Pattern.DOTALL);
-    private static final Pattern ML_STRING_BREAKS = Pattern.compile("\\\\$\\s*", Pattern.DOTALL);
+    private static final Pattern ML_LITERAL_STRING_PATTERN = Pattern.compile(ML_LITERAL_STRING, Pattern.DOTALL);
     // Current instance matchers
     private final Matcher arrayLineMatcher = ARRAY_LINE_PATTERN.matcher("");
     private final Matcher groupMatcher = GROUP_PATTERN.matcher("");
     private final Matcher commentMatcher = COMMENT_PATTERN.matcher("");
     private final Matcher lineMatcher = LINES_PATTERN.matcher("");
+    // This is used to simulate a newline in a multi-line literal string where nothing can be escaped
+    private final String multiLineLiteralStringNewLine = UUID.randomUUID().toString();
 
     /** The list of handlers */
     private final List<Handler> handlers = new ArrayList<Handler>() {{
@@ -63,6 +67,9 @@ public class SimpleTomlParser implements TomlParser {
         add(new Handler(KEY_EQUALS + DIGITS + SPACES + POSSIBLE_COMMENT) {Object cast(String v) {return Long.valueOf(v);}});
         // strings
         add(new Handler(KEY_EQUALS + STRING + SPACES) {Object cast(String v) {return Util.TomlString.unescape(v.trim());}});
+        // literal strings
+        add(new Handler(KEY_EQUALS + ML_LITERAL_STRING + SPACES) {Object cast(String v) {return v.replaceAll(multiLineLiteralStringNewLine, "\n");}});
+        add(new Handler(KEY_EQUALS + LITERAL_STRING + SPACES) {Object cast(String v) {return v;}});
         // booleans
         add(new Handler(KEY_EQUALS + BOOLEAN + SPACES + POSSIBLE_COMMENT) {Object cast(String v) {return Boolean.parseBoolean(v);}});
     }};
@@ -119,7 +126,7 @@ public class SimpleTomlParser implements TomlParser {
     }
 
     /**
-     * Find every multi line strings in the given string and make them one line.
+     * Find every multi line strings in the given string and make them one-liner.
      * @return the given String with multi line strings as a single line one
      */
     private String prepareMultiLineStrings(String s) {
@@ -130,6 +137,16 @@ public class SimpleTomlParser implements TomlParser {
             // find \s
             inside = inside.replaceAll("\\\\\\s*", "");
             m.appendReplacement(b, "\"" + (inside.startsWith("\n") ? inside.substring(1) : inside).replaceAll("\n", "\\\\\\\\n") + "\"");
+        }
+        m.appendTail(b);
+
+        m = ML_LITERAL_STRING_PATTERN.matcher(b.toString());
+        b = new StringBuffer();
+        while (m.find()) {
+            String inside = m.group(1);
+            String replacement = (inside.startsWith("\n") ? inside.substring(1) : inside).replaceAll("\n", multiLineLiteralStringNewLine);
+            System.out.println("Scanning " + inside + " -> " + replacement);
+            m.appendReplacement(b, "'''" + replacement.replaceAll("\\\\", "\\\\\\\\") + "'''");
         }
         m.appendTail(b);
         return b.toString();

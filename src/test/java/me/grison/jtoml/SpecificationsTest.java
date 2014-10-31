@@ -148,6 +148,30 @@ public class SpecificationsTest {
         assertEquals(t.getString("a"), "Some awesome value");
     }
 
+    @Test
+    public void testLiteralStrings() {
+        Toml t = Toml.parse("winpath  = 'C:\\Users\\nodejs\\templates'\n" +
+                "winpath2 = '\\\\ServerX\\admin$\\system32\\'\n" +
+                "quoted   = 'Tom \"Dubs\" Preston-Werner'\n" +
+                "regex    = '<\\i\\c*\\s*>'");
+        assertEquals("C:\\Users\\nodejs\\templates", t.getString("winpath"));
+        assertEquals("\\\\ServerX\\admin$\\system32\\", t.getString("winpath2"));
+        assertEquals("Tom \"Dubs\" Preston-Werner", t.getString("quoted"));
+        assertEquals("<\\i\\c*\\s*>", t.getString("regex"));
+        t = Toml.parse("regex2 = '''I [dw]on't need \\d{2} apples'''\n" +
+                "lines  = '''\n" +
+                "The first newline is\n" +
+                "trimmed in raw strings.\n" +
+                "   All other whitespace\n" +
+                "   is preserved.\n" +
+                "'''");
+        assertEquals("I [dw]on't need \\d{2} apples", t.getString("regex2"));
+        assertEquals( "The first newline is\n" +
+                "trimmed in raw strings.\n" +
+                "   All other whitespace\n" +
+                "   is preserved.\n", t.getString("lines")); // even the last newline character is kept
+    }
+
     /**
      * Simple class tested above.
      */
