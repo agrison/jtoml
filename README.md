@@ -148,6 +148,11 @@ score = 42
 **Note:** Like for custom types above, supported types are `Long`, `String`, `Double`, `Boolean`, `Calendar`, `List`, `Map` or Objects having the pre-cited types only.
 
 
+### Support
+
+Should normally support everything in the Toml Spec.
+
+
 License
 -----
 [MIT License (MIT)](http://opensource.org/licenses/mit-license.php).
