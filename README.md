@@ -34,7 +34,7 @@ Add the jtoml dependency:
 ```
 
 **Note**: As of 2014-10-31 The current version is not on sonatype, in the meantime you can build the library yourself
-and install it in your local repository in order to use the latest fixes and enhancements with `mvn install` and using
+and install it in your local repository in order to use the latest fixes and enhancements with `mvn install -Dmaven.javadoc.skip=true` and using
 version `1.1.0` in your project.
 
 
