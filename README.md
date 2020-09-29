@@ -12,14 +12,10 @@ In order to use it, you may add this repository in your `pom.xml`:
 
 ```xml
 <repositories>
-  <repository>
-    <id>sonatype-nexus-snapshots</id>
-    <url>https://oss.sonatype.org/content/groups/public/</url>
-    <!-- If you want snapshots versions -->
-    <snapshots>
-      <enabled>true</enabled>
-    </snapshots>
-  </repository>
+    <repository>
+        <id>jtoml</id>
+        <url>https://raw.github.com/agriosn/jtoml/mvn-repo/</url>
+    </repository>
 </repositories>
 ```
 
@@ -29,13 +25,11 @@ Add the jtoml dependency:
 <dependency>
   <groupId>me.grison</groupId>
   <artifactId>jtoml</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.1</version>
 </dependency>
 ```
 
-**Note**: As of 2014-10-31 The current version is not on sonatype, in the meantime you can build the library yourself
-and install it in your local repository in order to use the latest fixes and enhancements with `mvn install` and using
-version `1.1.0` in your project.
+**Note**: The library is hosted on GitHub.
 
 
 Usage
