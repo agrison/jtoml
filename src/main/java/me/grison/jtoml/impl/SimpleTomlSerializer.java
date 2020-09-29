@@ -76,6 +76,12 @@ public class SimpleTomlSerializer implements TomlSerializer {
                 return serializeMap(rootKey, (Map<String, Object>) object);
             }
             final StringBuilder buffer = new StringBuilder(rootKey == null ? "" : "[" + rootKey + "]\n");
+            // simple types first
+            if (converters.containsKey(object.getClass())) {
+                buffer.append(converters.get(object.getClass()).convert(object));
+                return buffer.toString();
+            }
+            
             final List<Field> fields = Arrays.asList(object.getClass().getDeclaredFields());
             fields.sort(Util.Reflection.newTomlFieldComparator(fields));
             for (Field f : fields) {
