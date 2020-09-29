@@ -9,7 +9,7 @@ import java.util.Map;
  *
  * <p>See: The <a href="https://github.com/mojombo/toml">TOML GitHub</a> project for more information about it.</p>
  *
- * @author <a href="a.grison@gmail.com">$Author: Alexandre Grison$</a>
+ * @author Alexandre Grison
  */
 public interface TomlParser {
     /**
@@ -18,5 +18,5 @@ public interface TomlParser {
      * @param tomlString the TOML String
      * @return a Map representing the given TOML structure.
      */
-    public Map<String, Object> parse(String tomlString);
+    Map<String, Object> parse(String tomlString);
 }

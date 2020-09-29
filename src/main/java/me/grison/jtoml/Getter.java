@@ -7,11 +7,12 @@ import java.util.Map;
 /**
  * Toml getter interface.
  *
- * @author <a href="mailto:a.grison@gmail.com">$Author: Alexandre Grison$</a>
+ * @author Alexandre Grison
  */
 public interface Getter {
     /**
      * Get the object.
+     *
      * @param key the key where the object is located
      * @return the object located at the given key.
      */
@@ -19,6 +20,7 @@ public interface Getter {
 
     /**
      * Get the string.
+     *
      * @param key the key where the object is located
      * @return the string located at the given key.
      */
@@ -26,6 +28,7 @@ public interface Getter {
 
     /**
      * Get the Long value.
+     *
      * @param key the key where the object is located
      * @return the long located at the given key.
      */
@@ -33,6 +36,7 @@ public interface Getter {
 
     /**
      * Get the double value.
+     *
      * @param key the key where the object is located
      * @return the float located at the given key.
      */
@@ -40,6 +44,7 @@ public interface Getter {
 
     /**
      * Get the date (as Calendar)
+     *
      * @param key the key where the object is located
      * @return the date located at the given key.
      */
@@ -47,6 +52,7 @@ public interface Getter {
 
     /**
      * Get the list.
+     *
      * @param key the key where the object is located
      * @return the list located at the given key.
      */
@@ -54,6 +60,7 @@ public interface Getter {
 
     /**
      * Get a boolean.
+     *
      * @param key the key where the object is located
      * @return the boolean located at the given key.
      */
@@ -61,6 +68,7 @@ public interface Getter {
 
     /**
      * Get a Map.
+     *
      * @param key the key where the object is located
      * @return the map located at the given key.
      */
@@ -68,9 +76,10 @@ public interface Getter {
 
     /**
      * Get an object of a specific class.
-     * @param key the key where the object is located
+     *
+     * @param key   the key where the object is located
      * @param clazz the class of the object
-     * @param <T> the type
+     * @param <T>   the type
      * @return the object located at the given key.
      */
     <T> T getAs(String key, Class<T> clazz);

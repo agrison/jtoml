@@ -3,7 +3,6 @@ package me.grison.jtoml.impl;
 import me.grison.jtoml.*;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -14,33 +13,42 @@ import java.util.regex.Pattern;
 
 /**
  * Toml parsing class front-end.
- * 
+ *
  * <code>
- *     Toml toml = Toml.parse("pi = 3.141592653589793");
- *     Double pi = toml.getDouble("pi");
+ * Toml toml = Toml.parse("pi = 3.141592653589793");
+ * Double pi = toml.getDouble("pi");
  * </code>
  *
- * @author <a href="mailto:a.grison@gmail.com">$Author: Alexandre Grison$</a>
-*/
+ * @author Alexandre Grison
+ */
+@SuppressWarnings("unchecked")
 public class Toml implements Parser, Getter {
     private static final Logger LOGGER = Logger.getLogger(Toml.class.getName());
-    /** The default {@link TomlParser} loaded from {@link ServiceLoader}. Defaults to {@link SimpleTomlParser} if none found*/
-    private static TomlParser defaultParser;
-    /** The instance context map holding key/values parsed from a TOML String or File */
-    protected Map<String, Object> context = new LinkedHashMap<String, Object>();
-    /** A matcher to retrieve the path to a key. */
-    protected final Matcher keyPathMatcher = Pattern.compile("((\\w+[.])+).*").matcher("");
-    /** Current instance parser: default to `Toml.defaultParser` if none specified */
-    protected TomlParser tomlParser;
-    /** Current instance serializer */
-    private static TomlSerializer tomlSerializer = new SimpleTomlSerializer();
-
     /**
-     * Retrieve a TomlParser on classpath.
+     * The default {@link TomlParser} loaded from {@link ServiceLoader}. Defaults to {@link SimpleTomlParser} if none found
      */
+    private static TomlParser defaultParser;
+    /**
+     * Current instance serializer
+     */
+    private static final TomlSerializer tomlSerializer = new SimpleTomlSerializer();
+
     static {
         initDefaultParser();
     }
+
+    /**
+     * A matcher to retrieve the path to a key.
+     */
+    protected final Matcher keyPathMatcher = Pattern.compile("((\\w+[.])+).*").matcher("");
+    /**
+     * The instance context map holding key/values parsed from a TOML String or File
+     */
+    protected Map<String, Object> context = new LinkedHashMap<>();
+    /**
+     * Current instance parser: default to `Toml.defaultParser` if none specified
+     */
+    protected TomlParser tomlParser;
 
     /**
      * Default constructor.
@@ -74,7 +82,6 @@ public class Toml implements Parser, Getter {
      * @param tomlString the TOML String to load.
      * @param tomlParser the TOML parser to use
      * @return a TOML object instance
-     * @throws IOException
      */
     public static Toml parse(String tomlString, TomlParser tomlParser) {
         return new Toml(tomlParser).parseString(tomlString);
@@ -85,22 +92,69 @@ public class Toml implements Parser, Getter {
      *
      * @param file the TOML file to load
      * @return a TOML object instance
-     * @throws IOException
      */
-    public static Toml parse(File file) throws IOException {
+    public static Toml parse(File file) {
         return parse(file, null);
     }
 
     /**
      * Creates a TOML instance loaded with the given file and using the given TOML parser.
      *
-     * @param file the TOML file to load
+     * @param file       the TOML file to load
      * @param tomlParser the TOML parser to use
      * @return a TOML object instance
-     * @throws IOException
      */
-    public static Toml parse(File file, TomlParser tomlParser) throws IOException {
+    public static Toml parse(File file, TomlParser tomlParser) {
         return new Toml(tomlParser).parseFile(file);
+    }
+
+    /**
+     * Serializes the given Object to a TOML String.
+     *
+     * @param object the Object to be serialized
+     * @return the TOML String representing the given Object.
+     */
+    public static String serialize(Object object) {
+        return serialize(null, object);
+    }
+
+    /**
+     * Serializes the given Object to a TOML String.
+     *
+     * @param rootKey the root key (can be empty or null)
+     * @param object  the Object to be serialized
+     * @return the TOML String representing the given Object.
+     */
+    public static String serialize(String rootKey, Object object) {
+        return tomlSerializer.serialize(rootKey, object);
+    }
+
+    /**
+     * Uses a ServiceLoader to locate available {@link TomlParser} on classpath.
+     * If none is found, the default {@link SimpleTomlParser} is used
+     *
+     * @throws IllegalStateException if too much {@link TomlParser} are found on classpath.
+     */
+    private static void initDefaultParser() {
+        List<TomlParser> parsers = new ArrayList<>();
+        for (TomlParser value : ServiceLoader.load(TomlParser.class)) parsers.add(value);
+        // check too much (built-in one always available + one additional is OK)
+        if (parsers.size() > 2) {
+            throw new IllegalStateException("Too much TomlParser found on classpath: " + parsers);
+        }
+        // iterate on all available parsers
+        for (TomlParser parser : parsers) {
+            LOGGER.log(Level.CONFIG, "Found TomlParser instance on classpath: " + parser.getClass().getName());
+            if (SimpleTomlParser.class.equals(parser.getClass()) && defaultParser != null) {
+                continue;
+            }
+            defaultParser = parser;
+        }
+        // last-chance fallback
+        if (defaultParser == null) {
+            defaultParser = new SimpleTomlParser();
+            LOGGER.log(Level.WARNING, "No TomlParser service loaded, defaulting to: " + defaultParser.getClass().getName());
+        }
     }
 
     @Override
@@ -109,10 +163,10 @@ public class Toml implements Parser, Getter {
         return this;
     }
 
-	@Override
-	public Toml parseFile(File file) throws FileNotFoundException {
+    @Override
+    public Toml parseFile(File file) {
         return parseString(Util.FileToString.read(file));
-	}
+    }
 
     /**
      * Gets the parser currently used to parse TOML.
@@ -130,6 +184,7 @@ public class Toml implements Parser, Getter {
 
     /**
      * Gets the parser currently used to parse TOML.
+     *
      * @return the current TOML parser.
      */
     public TomlParser getTomlParser() {
@@ -140,9 +195,9 @@ public class Toml implements Parser, Getter {
      * Get the path to a key.
      * A key can be anything like <code>(\w[.])*\w</code>
      *
-     * <p><code>keyPath("foo") -> "foo"</code></p>
-     * <p><code>keyPath("foo.bar") -> "foo"</code></p>
-     * <p><code>keyPath("foo.bar.bazz") -> "foo.bar"</code></p>
+     * <p><code>keyPath("foo") → "foo"</code></p>
+     * <p><code>keyPath("foo.bar") → "foo"</code></p>
+     * <p><code>keyPath("foo.bar.bazz") → "foo.bar"</code></p>
      *
      * @param key the key
      * @return the path leading to the key.
@@ -158,19 +213,19 @@ public class Toml implements Parser, Getter {
     /**
      * Find the correct level context.
      * findContext({"foo": {"bar": "hello"}}, "foo.bar")
-     * -> "hello"
+     * → "hello"
      *
      * @param context the context
-     * @param key the key
+     * @param key     the key
      * @return the context
      */
     public Map<String, Object> findContext(Map<String, Object> context, String key) {
         Map<String, Object> visitor = context;
-        for (String part: key.split("[.]")) {
+        for (String part : key.split("[.]")) {
             if (!visitor.containsKey(part)) {
                 return null;
             }
-            visitor = (Map<String, Object>)visitor.get(part);
+            visitor = (Map<String, Object>) visitor.get(part);
         }
         return visitor;
     }
@@ -226,16 +281,16 @@ public class Toml implements Parser, Getter {
      * Get a new instance of the given Class filled with the value that can be found
      * in the current context at the given key.
      *
-     * @param key the key where the value is located
+     * @param key   the key where the value is located
      * @param clazz the class of the resulting object
-     * @param <T> the resulting object type
+     * @param <T>   the resulting object type
      * @return the value whose key is the given parameter
      */
     @Override
     public <T> T getAs(String key, Class<T> clazz) {
         try {
             T result = clazz.newInstance();
-            for (Field f: clazz.getDeclaredFields()) {
+            for (Field f : clazz.getDeclaredFields()) {
                 Class<?> fieldType = f.getType();
                 String fieldName = (key == null || "".equals(key.trim())) ? f.getName() : key + "." + f.getName();
                 Object fieldValue = Util.Reflection.isTomlSupportedType(fieldType) ? //
@@ -253,9 +308,9 @@ public class Toml implements Parser, Getter {
      * Get the value whose key is the given parameter from the context map and cast it to the given class.
      * <p>Returns null if the value is null.</p>
      *
-     * @param key the key to search the value for.
+     * @param key   the key to search the value for.
      * @param clazz the class of the resulting object
-     * @param <T> the resulting object type
+     * @param <T>   the resulting object type
      * @return the value whose key is the given parameter, <code>null</code> if not found
      */
     private <T> T get(String key, Class<T> clazz) {
@@ -289,64 +344,15 @@ public class Toml implements Parser, Getter {
     }
 
     /**
-     * Serializes the given Object to a TOML String.
-     *
-     * @param object the Object to be serialized
-     * @return the TOML String representing the given Object.
-     */
-    public static String serialize(Object object) {
-        return serialize(null, object);
-    }
-
-    /**
-     * Serializes the given Object to a TOML String.
-     *
-     * @param rootKey the root key (can be empty or null)
-     * @param object the Object to be serialized
-     * @return the TOML String representing the given Object.
-     */
-    public static String serialize(String rootKey, Object object) {
-        return tomlSerializer.serialize(rootKey, object);
-    }
-
-    /**
      * Creates an IllegalArgumentException with a pre-filled message.
-     * @param key the key
+     *
+     * @param key      the key
      * @param expected the expected type
-     * @param value the value
+     * @param value    the value
      * @return the exception ready to be thrown
      */
     private IllegalArgumentException illegalArg(String key, Object value, Class<?> expected) {
-       return new IllegalArgumentException(String.format("Value for key `%s` is `%s`%s.", //
-               key, value, (value == null ? "" : ". Expected type was `" + expected.getName() + "`")));
-    }
-
-    /**
-     * Uses a ServiceLoader to locate available {@link TomlParser} on classpath.
-     * If none is found, the default {@link SimpleTomlParser} is used
-     *
-     * @throws IllegalStateException if too much {@link TomlParser} are found on classpath.
-     */
-    private static void initDefaultParser() {
-        List<TomlParser> parsers = new ArrayList<TomlParser>();
-        Iterator<TomlParser> parserIterator = ServiceLoader.load(TomlParser.class).iterator();
-        while(parserIterator.hasNext()) parsers.add(parserIterator.next());
-        // check too much (built-in one always available + one additional is OK)
-        if (parsers.size() > 2) {
-            throw new IllegalStateException("Too much TomlParser found on classpath: " + parsers);
-        }
-        // iterate on all available parsers
-        for (TomlParser parser: parsers) {
-            LOGGER.log(Level.CONFIG, "Found TomlParser instance on classpath: " + parser.getClass().getName());
-            if (SimpleTomlParser.class.equals(parser.getClass()) && defaultParser != null) {
-                continue;
-            }
-            defaultParser = parser;
-        }
-        // last-chance fallback
-        if (defaultParser == null) {
-            defaultParser = new SimpleTomlParser();
-            LOGGER.log(Level.WARNING, "No TomlParser service loaded, defaulting to: " + defaultParser.getClass().getName());
-        }
+        return new IllegalArgumentException(String.format("Value for key `%s` is `%s`%s.", //
+                key, value, (value == null ? "" : ". Expected type was `" + expected.getName() + "`")));
     }
 }

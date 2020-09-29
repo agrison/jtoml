@@ -1,8 +1,11 @@
 package me.grison.jtoml;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -10,18 +13,17 @@ import java.util.*;
 /**
  * Toml Utilities.
  *
- * @author <a href="mailto:a.grison@gmail.com">$Author: Alexandre Grison$</a>
+ * @author Alexandre Grison
  */
 public class Util {
     /**
      * <p>Helper class for handling ISO 8601 strings of the following format:</p>
      * <p>"2008-03-01T13:00:00+01:00". It also supports parsing the "Z" timezone.</p>
-     * <p/>
+     *
      * <p>Author: <a href="http://stackoverflow.com/users/1010931/wrygiel">wrigiel</a></p>
      * <p>Taken from: http://stackoverflow.com/questions/2201925/converting-iso8601-compliant-string-to-java-util-date</p>
      */
     public static class ISO8601 {
-        /** Transform ISO 8601 string to Calendar. */
         public static Calendar toCalendar(final String iso8601string) throws ParseException {
             Calendar calendar = GregorianCalendar.getInstance();
             String s = iso8601string.replace("Z", "+00:00");
@@ -34,7 +36,7 @@ public class Util {
             calendar.setTime(date);
             return calendar;
         }
-         /** Transform Calendar to ISO 8601 string */
+
         public static String fromCalendar(final Calendar calendar) {
             Date date = calendar.getTime();
             String formatted = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(date);
@@ -44,12 +46,12 @@ public class Util {
 
     /**
      * Toml String Utilities.
-     * <p/>
+     * <p>
      * Note: This is to avoid dependency on Apache commons for such limited features.
      */
     public static class TomlString {
-        private static Map<Character, Character> ESCAPE = new HashMap<Character, Character>();
-        private static Map<Character, Character> UNESCAPE = new HashMap<Character, Character>() {{
+        private static final Map<Character, Character> ESCAPE = new HashMap<>();
+        private static final Map<Character, Character> UNESCAPE = new HashMap<Character, Character>() {{
             put('0', '\u0000');
             put('t', '\t');
             put('n', '\n');
@@ -57,8 +59,9 @@ public class Util {
             put('\\', '\\');
             put('"', '"');
         }};
+
         static {
-            for (Map.Entry<Character, Character> e: UNESCAPE.entrySet()) {
+            for (Map.Entry<Character, Character> e : UNESCAPE.entrySet()) {
                 ESCAPE.put(e.getValue(), e.getKey());
             }
         }
@@ -68,19 +71,19 @@ public class Util {
          * It will replace characters (<code>'\' + 't'</code>, <code>'\' + 'n'</code>, ...) to there equivalent (<code>'\t'</code>, <code>'\n'</code>).
          *
          * <ul>
-         *     <li><code>'\'</code> + <code>'0'</code> -> <code>'\0'</code> null character (0x00)</li>
-         *     <li><code>'\'</code> + <code>'t'</code> -> <code>'\t'</code> tab character (0x09)</li>
-         *     <li><code>'\'</code> + <code>'n'</code> -> <code>'\n'</code> newline character (0x0a)</li>
-         *     <li><code>'\'</code> + <code>'r'</code> -> <code>'\r'</code> carriage return character (0x0d)</li>
-         *     <li><code>'\'</code> + <code>'"'</code> -> <code>'"'</code> quote character (0x22)</li>
-         *     <li><code>'\'</code> + <code>'\'</code> -> <code>'\'</code> backslash character (0x5c)</li>
-         * </ul>
+         *     <li><code>'\'</code> + <code>'0'</code> → <code>'\0'</code> null character (0x00)</li>
+         *     <li><code>'\'</code> + <code>'t'</code> → <code>'\t'</code> tab character (0x09)</li>
+         *     <li><code>'\'</code> + <code>'n'</code> → <code>'\n'</code> newline character (0x0a)</li>
+         *     <li><code>'\'</code> + <code>'r'</code> → <code>'\r'</code> carriage return character (0x0d)</li>
+         *     <li><code>'\'</code> + <code>'"'</code> → <code>'"'</code> quote character (0x22)</li>
+         *     <li><code>'\'</code> + <code>'\'</code> → <code>'\'</code> backslash character (0x5c)</li>
+         * </ul>i
          *
          * @param input the String to unescape
          * @return the unescaped String
          */
         public static String unescape(String input) {
-            StringBuffer buffer = new StringBuffer(input.length());
+            StringBuilder buffer = new StringBuilder(input.length());
             for (int i = 0; i < input.length(); i++) {
                 char ch = input.charAt(i);
                 if (ch != '\\') {
@@ -93,10 +96,10 @@ public class Util {
                     if (UNESCAPE.containsKey(ch)) {
                         buffer.append(UNESCAPE.get(ch));
                     } else if (ch == 'u') {
-                        String unicodeHexValue = String.valueOf(input.charAt(++i)) + String.valueOf(input.charAt(++i)) +
-                                String.valueOf(input.charAt(++i)) + String.valueOf(input.charAt(++i));
+                        String unicodeHexValue = input.charAt(++i) + String.valueOf(input.charAt(++i)) +
+                                input.charAt(++i) + input.charAt(++i);
                         if (unicodeHexValue.matches("[0-9a-fA-F]{4}")) {
-                            buffer.append((char)Integer.parseInt(unicodeHexValue, 16));
+                            buffer.append((char) Integer.parseInt(unicodeHexValue, 16));
                         }
                     } else {
                         throw new IllegalArgumentException("Escape sequence \\ " + ch + " in isn't known. " + //
@@ -113,24 +116,28 @@ public class Util {
          * It will replace characters (<code>'\t'</code>, <code>'\n'</code>, ...) to there equivalent (<code>'\' + 't'</code>, <code>'\' + 'n'</code>).
          *
          * <ul>
-         *     <li><code>'\0'</code> null character (0x00) -> <code>'\'</code> + <code>'0'</code></li>
-         *     <li><code>'\t'</code> tab character (0x09) -> <code>'\'</code> + <code>'t'</code></li>
-         *     <li><code>'\n'</code> newline character (0x0a) -> <code>'\'</code> + <code>'n'</code></li>
-         *     <li><code>'\r'</code> carriage return character (0x0d) -> <code>'\'</code> + <code>'r'</code></li>
-         *     <li><code>'\"'</code> quote character (0x22) -> <code>'\'</code> + <code>'"'</code> </li>
-         *     <li><code>'\\'</code> backslash character (0x5c) -> <code>'\'</code> + <code>'\'</code></li>
+         *     <li><code>'\0'</code> null character (0x00) → <code>'\'</code> + <code>'0'</code></li>
+         *     <li><code>'\t'</code> tab character (0x09) → <code>'\'</code> + <code>'t'</code></li>
+         *     <li><code>'\n'</code> newline character (0x0a) → <code>'\'</code> + <code>'n'</code></li>
+         *     <li><code>'\r'</code> carriage return character (0x0d) → <code>'\'</code> + <code>'r'</code></li>
+         *     <li><code>'\"'</code> quote character (0x22) → <code>'\'</code> + <code>'"'</code> </li>
+         *     <li><code>'\\'</code> backslash character (0x5c) → <code>'\'</code> + <code>'\'</code></li>
          * </ul>
          *
          * @param input the String to escape
          * @return the escaped String
          */
         public static String escape(String input) {
-            StringBuffer buffer = new StringBuffer(input.length());
+            StringBuilder buffer = new StringBuilder(input.length());
             for (int i = 0; i < input.length(); i++) {
                 char ch = input.charAt(i);
+                /* SPACE */
+                /* DEL and above */
+                /* SPACE */
+                /* DEL and above */
                 if (ESCAPE.containsKey(ch)) {
                     buffer.append("\\").append(ESCAPE.get(ch));
-                } else if ((ch >= 0x00 && ch < 0x20 /* SPACE */) || (ch >= 0x7F /* DEL and above */)) {
+                } else if (ch < 0x20 || ch >= 0x7F) {
                     buffer.append("\\u").append(Integer.toHexString(ch));
                 } else {
                     buffer.append(ch);
@@ -142,7 +149,7 @@ public class Util {
         /**
          * Creates a String made of spaces repeated for the given amount of time.
          * <p/>
-         * <code>createWhitespaceString(3) -> "&nbsp;&nbsp;&nbsp;" // 3 spaces</code>
+         * <code>createWhitespaceString(3) → "&nbsp;&nbsp;&nbsp;" // 3 spaces</code>
          *
          * @param length the length of the resulting String
          * @return a String made of a number of spaces equals to the given `length` parameter.
@@ -156,7 +163,7 @@ public class Util {
         /**
          * Counts the number of occurrences of a String in an other String.
          *
-         * @param str the String to search in.
+         * @param str    the String to search in.
          * @param needle the String to count the occurrences of.
          * @return the number of occurrences found.
          */
@@ -175,14 +182,13 @@ public class Util {
 
     /**
      * Utilities around File to String conversions.
-     * <p/>
+     * <p>
      * Note: This is to avoid dependency on Apache commons for such limited features.
      */
     public static class FileToString {
-        public static String read(File file)
-                throws FileNotFoundException {
+        public static String read(File file) {
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF8"));
+                BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
 
                 String str;
                 StringBuilder b = new StringBuilder();
@@ -202,8 +208,10 @@ public class Util {
      * Utilities around Reflection.
      */
     public static class Reflection {
-        /** List of types supported Natively by TOML + Map */
-        static final Set<Class<?>> TOML_SUPPORTED = new HashSet<Class<?>>(Arrays.asList(
+        /**
+         * List of types supported Natively by TOML + Map
+         */
+        static final Set<Class<?>> TOML_SUPPORTED = new HashSet<>(Arrays.asList(
                 int.class, Integer.class, //
                 long.class, Long.class, //
                 double.class, Double.class, //
@@ -228,10 +236,10 @@ public class Util {
         /**
          * Set the value of the given field on given object.
          *
-         * @param field the field
+         * @param field  the field
          * @param object the object
-         * @param value the value
-         * @throws IllegalAccessException
+         * @param value  the value
+         * @throws IllegalAccessException if the field cannot be set
          */
         public static void setFieldValue(Field field, Object object, Object value) throws IllegalAccessException {
             boolean isAccessible = field.isAccessible();
@@ -243,9 +251,10 @@ public class Util {
         /**
          * Get the value of the given field on given object.
          *
-         * @param field the field
+         * @param field  the field
          * @param object the object
-         * @throws IllegalAccessException
+         * @return the field value
+         * @throws IllegalAccessException if the field cannot be retrieved
          */
         public static Object getFieldValue(Field field, Object object) throws IllegalAccessException {
             boolean isAccessible = field.isAccessible();
@@ -290,10 +299,11 @@ public class Util {
             boolean o2Supported = Util.Reflection.isTomlSupportedTypeExceptMap(field2.getType());
             // if built-in types or both complex types, keep original ordering
             if ((o1Supported && o2Supported) || (!o1Supported && !o2Supported)) {
-                return Integer.valueOf(originalFields.indexOf(field1)).compareTo(originalFields.indexOf(field2));
+                return Integer.compare(originalFields.indexOf(field1), originalFields.indexOf(field2));
             } else { // put complex types at the end
                 return o1Supported ? -1 : 1;
             }
         }
-    };
+    }
+
 }

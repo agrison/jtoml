@@ -3,7 +3,7 @@ package me.grison.jtoml;
 /**
  * Toml TomlSerializer interface.
  *
- * @author <a href="mailto:a.grison@gmail.com">$Author: Alexandre Grison$</a>
+ * @author Alexandre Grison
  */
 public interface TomlSerializer {
     /**
@@ -18,7 +18,7 @@ public interface TomlSerializer {
      * Serializes the given Object to a TOML String.
      *
      * @param rootKey the root key (can be empty or null)
-     * @param object the Object to be serialized
+     * @param object  the Object to be serialized
      * @return the TOML String representing the given Object.
      */
     String serialize(String rootKey, Object object);

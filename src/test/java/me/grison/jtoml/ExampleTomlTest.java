@@ -26,7 +26,7 @@ public class ExampleTomlTest {
 	private static Toml toml;
 
 	@BeforeClass
-	public static void parseExampleFile() throws FileNotFoundException {
+	public static void parseExampleFile() {
         toml = new Toml();
 		String exampleToml = Util.FileToString.read(new File(toml.getClass().getResource("/example.toml").getFile()));
 		toml.parseString(exampleToml);
@@ -71,7 +71,7 @@ public class ExampleTomlTest {
 		// ports = [ 8001, 8001, 8002 ]
 		assertEquals("192.168.1.1", toml.get("database.server"));
 		assertEquals(
-				createList(Long.valueOf(8001), Long.valueOf(8001), Long.valueOf(8002)),
+				createList(8001L, 8001L, 8002L),
                 toml.getList("database.ports"));
 	}
 
@@ -90,8 +90,8 @@ public class ExampleTomlTest {
 		// [database]
 		// enabled = true
 		// awesome = false # just because
-		assertEquals(Boolean.valueOf(true), toml.getBoolean("database.enabled"));
-		assertEquals(Boolean.valueOf(false),
+		assertEquals(Boolean.TRUE, toml.getBoolean("database.enabled"));
+		assertEquals(Boolean.FALSE,
 				toml.getBoolean("database.awesome"));
 	}
 
@@ -120,7 +120,7 @@ public class ExampleTomlTest {
 		// parsers support it
 		assertEquals(ExampleTomlTest.<Object> createList(
 				createList("gamma", "delta"),
-				createList(Long.valueOf(1), Long.valueOf(2))),
+				createList(1L, 2L)),
 				toml.getList("clients.data"));
 	}
 

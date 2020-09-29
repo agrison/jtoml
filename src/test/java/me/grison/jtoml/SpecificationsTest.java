@@ -3,19 +3,24 @@ package me.grison.jtoml;
 import me.grison.jtoml.impl.Toml;
 import org.junit.Assert;
 import org.junit.Test;
-import java.util.*;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
 /**
  * Unit test for specifications (types).
  *
- * @author <a href="mailto:a.grison@gmail.com">$Author: Alexandre Grison$</a>
+ * @author Alexandre Grison
  */
 public class SpecificationsTest {
     static {
         Locale.setDefault(Locale.US);
     }
+
     @Test
     public void testInteger() {
         Toml toml = Toml.parse("foo = 42");
@@ -25,14 +30,14 @@ public class SpecificationsTest {
     @Test
     public void testDouble() {
         Toml toml = Toml.parse("foo = 3.141592653589793");
-        Assert.assertEquals(3.14159265, toml.getDouble("foo").doubleValue(), 0.00001d);
+        Assert.assertEquals(3.14159265, toml.getDouble("foo"), 0.00001d);
     }
 
     @Test
     public void testBoolean() {
         Toml toml = Toml.parse("foo = true\nbar = false");
-        Assert.assertEquals(true, toml.getBoolean("foo").booleanValue());
-        Assert.assertEquals(false, toml.getBoolean("bar").booleanValue());
+        Assert.assertEquals(true, toml.getBoolean("foo"));
+        Assert.assertEquals(false, toml.getBoolean("bar"));
     }
 
     @Test
@@ -84,13 +89,13 @@ public class SpecificationsTest {
     @Test
     public void testNull() {
         Toml toml = Toml.parse("foo = 1337");
-        Assert.assertEquals(null, toml.get("bar"));
-        Assert.assertEquals(null, toml.getString("bar"));
-        Assert.assertEquals(null, toml.getLong("bar"));
-        Assert.assertEquals(null, toml.getDouble("bar"));
-        Assert.assertEquals(null, toml.getDate("bar"));
-        Assert.assertEquals(null, toml.getBoolean("bar"));
-        Assert.assertEquals(null, toml.getList("bar"));
+        Assert.assertNull(toml.get("bar"));
+        Assert.assertNull(toml.getString("bar"));
+        Assert.assertNull(toml.getLong("bar"));
+        Assert.assertNull(toml.getDouble("bar"));
+        Assert.assertNull(toml.getDate("bar"));
+        Assert.assertNull(toml.getBoolean("bar"));
+        Assert.assertNull(toml.getList("bar"));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -102,7 +107,7 @@ public class SpecificationsTest {
     @Test
     public void testGetMap() {
         Toml toml = Toml.parse("[foo]\nbar = true\nbaz = false");
-        Map<String, Object> map = (Map<String, Object>)toml.get("foo");
+        Map<String, Object> map = (Map<String, Object>) toml.get("foo");
         Assert.assertTrue(map.containsKey("bar") && map.get("bar").equals(Boolean.TRUE));
         Assert.assertTrue(map.containsKey("baz") && map.get("baz").equals(Boolean.FALSE));
     }
@@ -114,7 +119,7 @@ public class SpecificationsTest {
         Foo foo = toml.getAs("foo", Foo.class);
         Assert.assertEquals("a", foo.stringKey);
         Assert.assertEquals(Long.valueOf(42), foo.longKey);
-        Assert.assertEquals(Double.valueOf(13.37), foo.doubleKey, 0.00001d);
+        Assert.assertEquals(13.37, foo.doubleKey, 0.00001d);
         Assert.assertEquals(Boolean.TRUE, foo.booleanKey);
         Assert.assertEquals(Arrays.asList(1L, 2L, 3L), foo.listKey);
         Assert.assertEquals("Hello", foo.bar.bazz);
@@ -126,7 +131,7 @@ public class SpecificationsTest {
     }
 
     @Test
-    public void testSerialization() throws Exception {
+    public void testSerialization() {
         String tomlContent = "[foo]\nstringKey = \"a\"\nlongKey = 42\ndoubleKey = 13.37\n" + //
                 "booleanKey = true\nlistKey = [[1, 2, 3], [\"hello\", \"world\"]]\nawesome = true\n\n" +
                 "[foo.bar]\nbazz = \"Hello\"\ndummy = 459\n\n[foo.map]\none = 1\ntwo = 2";
@@ -166,7 +171,7 @@ public class SpecificationsTest {
                 "   is preserved.\n" +
                 "'''");
         assertEquals("I [dw]on't need \\d{2} apples", t.getString("regex2"));
-        assertEquals( "The first newline is\n" +
+        assertEquals("The first newline is\n" +
                 "trimmed in raw strings.\n" +
                 "   All other whitespace\n" +
                 "   is preserved.\n", t.getString("lines")); // even the last newline character is kept
