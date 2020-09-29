@@ -14,7 +14,7 @@ In order to use it, you may add this repository in your `pom.xml`:
 <repositories>
     <repository>
         <id>jtoml</id>
-        <url>https://raw.github.com/agriosn/jtoml/mvn-repo/</url>
+        <url>https://raw.github.com/agrison/jtoml/mvn-repo/</url>
     </repository>
 </repositories>
 ```
