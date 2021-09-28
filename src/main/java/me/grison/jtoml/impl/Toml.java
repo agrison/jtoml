@@ -1,6 +1,7 @@
 package me.grison.jtoml.impl;
 
 import me.grison.jtoml.*;
+import me.grison.jtoml.annotations.SerializedName;
 
 import java.io.File;
 import java.io.IOException;
@@ -292,7 +293,15 @@ public class Toml implements Parser, Getter {
             T result = clazz.newInstance();
             for (Field f : clazz.getDeclaredFields()) {
                 Class<?> fieldType = f.getType();
-                String fieldName = (key == null || "".equals(key.trim())) ? f.getName() : key + "." + f.getName();
+                SerializedName serializedNameAnnotation = f.getAnnotation(SerializedName.class);
+                String serializedFieldName = f.getName();
+                if (serializedNameAnnotation != null) {
+                    if (serializedNameAnnotation.value() != null &&
+                            !serializedNameAnnotation.value().equals("")) {
+                        serializedFieldName = serializedNameAnnotation.value();
+                    }
+                }
+                String fieldName = (key == null || "".equals(key.trim())) ? serializedFieldName : key + "." + serializedFieldName;
                 Object fieldValue = Util.Reflection.isTomlSupportedType(fieldType) ? //
                         get(fieldName, fieldType) : getAs(fieldName, fieldType);
                 Util.Reflection.setFieldValue(f, result, fieldValue);
