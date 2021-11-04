@@ -101,6 +101,7 @@ public class SimpleTomlParser implements TomlParser {
         Map<String, Object> context = result;
         tomlString = prepareMultiLineStrings(tomlString);
         tomlString = prepareArrays(tomlString);
+        System.out.println(tomlString);
         // match lines
         lineMatcher.reset(tomlString);
         while (lineMatcher.find()) {
@@ -126,10 +127,10 @@ public class SimpleTomlParser implements TomlParser {
         StringBuilder buffer = new StringBuilder();
         String currentLine = "";
         for (String l : s.split("\n")) {
+            l = skipComment(l);
             currentLine = currentLine + l;
             if (Util.TomlString.countOccurrences(currentLine, "[") == Util.TomlString.countOccurrences(currentLine, "]")) {
                 if (l.equals(currentLine)) { // nothing done
-                    currentLine = skipComment(currentLine);
                     buffer.append(currentLine);
                 } else { // multiline -> single line
                     buffer.append(
@@ -139,8 +140,6 @@ public class SimpleTomlParser implements TomlParser {
                 }
                 buffer.append("\n");
                 currentLine = "";
-            } else {
-                currentLine = skipComment(currentLine);
             }
         }
         return buffer.toString();
@@ -158,6 +157,9 @@ public class SimpleTomlParser implements TomlParser {
             String group2 = commentMatcher.group(2);
             if (group2.contains("\"")) {
                 String[] temp = group2.split("\"");
+                if (temp.length == 1) {
+                    return result;
+                }
                 String last = temp[temp.length - 1].trim();
                 Pattern pattern = Pattern.compile("(#.*)");
                 Matcher matcher = pattern.matcher(last);
@@ -168,6 +170,8 @@ public class SimpleTomlParser implements TomlParser {
                 }
             }
             result = result.replace(group2, "");
+        } else if (in.trim().startsWith("#")) {
+            return "";
         }
         return result;
     }

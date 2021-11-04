@@ -1,4 +1,13 @@
 # Special test
+colors2 = [
+    "#F00", # RED
+    "#0F0",
+    "#00F"
+]
+
+
+color = "#FF0000"
+
 something_more = [
     ",RED",
     ",BLU,E",
@@ -9,13 +18,6 @@ somethings = [
     ",RED" # RED
 ]
 
-colors2 = [
-    "#F00", # RED
-    "#0F0", # GREEN
-    "#00F" # BLUE
-]
-
-color = "#FF0000" # The color is red.
 alphabet = [ # Alphabets
     "A", # A
     "B", # B
@@ -23,6 +25,6 @@ alphabet = [ # Alphabets
 ]
 colors = ["#F00", "#0F0", "#00F"] # This is colors
 
-empty = [] # Empty
+empty = []
 
 nestedArray = [[",First", ",Second,", "T,hid"], [1,2,3]]
