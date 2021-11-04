@@ -103,6 +103,9 @@ public class Car {
     Boolean legendary;
     Calendar date;
     List<String> options;
+    
+    // @SerializedName("abstract")  // Use it if a field name conflicts with the java keyword
+    // String _abstract;
     // Constructors
 }
 

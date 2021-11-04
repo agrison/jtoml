@@ -6,6 +6,7 @@ import me.grison.jtoml.Util;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Builtin Toml parser.
@@ -32,7 +33,7 @@ public class SimpleTomlParser implements TomlParser {
     // Common patterns
     private static final Pattern ARRAY_LINE_PATTERN = Pattern.compile(KEY_EQUALS + ARRAY, Pattern.DOTALL);
     private static final Pattern GROUP_PATTERN = Pattern.compile(SPACES + "\\[(.*)]" + SPACES);
-    private static final Pattern COMMENT_PATTERN = Pattern.compile("([,\"\\]])\\s*(#.*)");
+    private static final Pattern COMMENT_PATTERN = Pattern.compile("([,\"\\]\\[])\\s*(#.*)");
     private static final Pattern LINES_PATTERN = Pattern.compile("([^\n]+)\n?");
     private static final Pattern ML_STRING_PATTERN = Pattern.compile("\"\"\"(.*?)\"\"\"", Pattern.DOTALL);
     private static final Pattern ML_LITERAL_STRING_PATTERN = Pattern.compile(ML_LITERAL_STRING, Pattern.DOTALL);
@@ -100,13 +101,11 @@ public class SimpleTomlParser implements TomlParser {
         Map<String, Object> context = result;
         tomlString = prepareMultiLineStrings(tomlString);
         tomlString = prepareArrays(tomlString);
+        System.out.println(tomlString);
         // match lines
         lineMatcher.reset(tomlString);
         while (lineMatcher.find()) {
             String line = lineMatcher.group().trim();
-            if (commentMatcher.reset(line).find()) {
-                line = line.replace(commentMatcher.group(2), "");
-            }
             if (groupMatcher.reset(line).matches()) {
                 context = createContextIfNeeded(result, groupMatcher.group(1));
             }
@@ -128,14 +127,14 @@ public class SimpleTomlParser implements TomlParser {
         StringBuilder buffer = new StringBuilder();
         String currentLine = "";
         for (String l : s.split("\n")) {
+            l = skipComment(l);
             currentLine = currentLine + l;
             if (Util.TomlString.countOccurrences(currentLine, "[") == Util.TomlString.countOccurrences(currentLine, "]")) {
                 if (l.equals(currentLine)) { // nothing done
                     buffer.append(currentLine);
                 } else { // multiline -> single line
                     buffer.append(
-                            currentLine.replaceAll("#[^],]+", "") // skip comments
-                                    .replaceAll("\\[\\s*", "[").replaceAll("\\s*]", "]") // remove spaces around brackets
+                            currentLine.replaceAll("\\[\\s*", "[").replaceAll("\\s*]", "]") // remove spaces around brackets
                                     .replaceAll(",\\s*", ",").replaceAll(",,", ",") // spaces and empty commas
                     );
                 }
@@ -145,6 +144,38 @@ public class SimpleTomlParser implements TomlParser {
         }
         return buffer.toString();
     }
+
+    /**
+     * Skip the comment in a line.
+     *
+     * @param in line
+     * @return result
+     */
+    private String skipComment(String in) {
+        String result = in;
+        if (commentMatcher.reset(result).find()) {
+            String group2 = commentMatcher.group(2);
+            if (group2.contains("\"")) {
+                String[] temp = group2.split("\"");
+                if (temp.length == 1) {
+                    return result;
+                }
+                String last = temp[temp.length - 1].trim();
+                Pattern pattern = Pattern.compile("(#.*)");
+                Matcher matcher = pattern.matcher(last);
+                if (matcher.find()) {
+                    group2 = matcher.group(1);
+                } else {
+                    return result;
+                }
+            }
+            result = result.replace(group2, "");
+        } else if (in.trim().startsWith("#")) {
+            return "";
+        }
+        return result;
+    }
+
 
     /**
      * Find every multi line strings in the given string and make them one-liner.
@@ -220,13 +251,34 @@ public class SimpleTomlParser implements TomlParser {
             // find nested arrays
             if (array.matches(".*(?:]),.*")) {
                 for (String nested : array.split("(?:]),")) {
-                    nested += "]";
+                    if (!nested.endsWith("]"))
+                        nested += "]";
+
                     Object[] nestedArray = readObject(nested.trim());
                     if (nestedArray != null)
                         values.add(nestedArray[1]);
                 }
             } else {
-                for (String value : array.split(",")) {
+                List<String> items = new LinkedList<>();
+                if (array.startsWith("\"")) {
+                    // string array
+                    boolean isQuotationMarkClose = true;
+                    int startPosition = 0;
+                    for (int i = 0; i < array.length(); i++) {
+                        if (array.charAt(i) == '\"') {
+                            isQuotationMarkClose = !isQuotationMarkClose;
+                            if (isQuotationMarkClose && array.length() == (i + 1)) {
+                                items.add(array.substring(startPosition, i + 1));
+                            }
+                        } else if (array.charAt(i) == ',' && isQuotationMarkClose) {
+                            items.add(array.substring(startPosition, i));
+                            startPosition = i + 1;
+                        }
+                    }
+                } else {
+                    items = Arrays.stream(array.split(",")).collect(Collectors.toList());
+                }
+                for (String value : items) {
                     value = value.trim();
                     if (value.endsWith("]"))
                         value = value.substring(0, value.length() - 1);
@@ -246,7 +298,6 @@ public class SimpleTomlParser implements TomlParser {
                             "Found all the following types in the same array declaration: " + types);
                 }
             }
-            //System.out.println("------> " + key + "=" + values);
             return new Object[]{key, values};
         }
         return null;
